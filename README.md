@@ -54,6 +54,7 @@ npm run dev
 ```
 
 This will start:
+
 - Vite dev server at `http://localhost:3000` (client)
 - Express API server at `http://localhost:5000` (server)
 
@@ -71,6 +72,7 @@ npm run build
 ```
 
 Outputs:
+
 - Client: `dist/public/`
 - Server: `dist/server/`
 
@@ -150,6 +152,7 @@ import type { DifficultyLevel } from "@shared/types";
 ### Server Configuration
 
 The Express server is configured with:
+
 - JSON and URL-encoded body parsing
 - CORS enabled for all origins
 - Health check endpoint

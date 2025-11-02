@@ -11,7 +11,7 @@ export default function HomePage() {
         Digital Design Composition Portal
       </p>
       <div className="mt-8 flex gap-2">
-        {levels.map((level) => (
+        {levels.map(level => (
           <span
             key={level}
             className="px-3 py-1 rounded-full text-sm bg-secondary"
