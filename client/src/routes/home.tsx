@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { BookOpen, Clock, ArrowRight } from "lucide-react";
+import { BookOpen, Clock, ArrowRight, Workflow } from "lucide-react";
 import { courseApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +34,12 @@ export default function HomePage() {
                 <Link href="/courses/guan-yuan-su-jie-gou">
                   开始学习
                   <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/workflow">
+                  工作流指南
+                  <Workflow className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </div>
