@@ -3,10 +3,14 @@ import { useCourseOutline, useCourseDetailPrefetch } from "@/utils/hooks";
 import { CourseSectionList } from "@/components/course/CourseSectionList";
 import { ListSkeleton } from "@/components/Skeleton";
 
-export default function Courses() {
+function CoursesContent() {
   const { data: courses } = useCourseOutline();
   const prefetchDetail = useCourseDetailPrefetch();
 
+  return <CourseSectionList courses={courses} onCourseFocus={prefetchDetail} />;
+}
+
+export default function Courses() {
   return (
     <article aria-labelledby="courses-heading">
       <header className="page-header">
@@ -15,7 +19,7 @@ export default function Courses() {
       </header>
 
       <Suspense fallback={<ListSkeleton />}>
-        <CourseSectionList courses={courses} onCourseFocus={prefetchDetail} />
+        <CoursesContent />
       </Suspense>
     </article>
   );

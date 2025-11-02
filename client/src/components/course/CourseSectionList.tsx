@@ -19,9 +19,9 @@ export function CourseSectionList({ courses = [], onCourseFocus }: CourseSection
             href={`/courses/${course.id}`}
             onFocus={() => handleFocusOrHover(course.id)}
             onMouseEnter={() => handleFocusOrHover(course.id)}
-            className="course-card"
+            className="surface-card course-card"
           >
-            <span className="week-badge">Week {course.week}</span>
+            <span className="badge">Week {course.week}</span>
             <h3>{course.title}</h3>
             <p>{course.description}</p>
           </Link>

@@ -1,27 +1,24 @@
+import { Suspense } from "react";
 import { useRoute } from "wouter";
 import { useCourseDetail } from "@/utils/hooks";
 import { ListSkeleton } from "@/components/Skeleton";
 
-export default function CourseDetail() {
-  const [match, params] = useRoute("/courses/:id");
-  const courseId = params?.id ?? "";
+function CourseContent({ courseId }: { courseId: string }) {
   const { data } = useCourseDetail(courseId);
 
-  if (!match) {
-    return <p>Course not found</p>;
-  }
-
   if (!data) {
-    return <ListSkeleton count={3} />;
+    return null;
   }
 
   return (
-    <article aria-labelledby="course-title">
-      <h2 id="course-title">{data.title}</h2>
-      <p>{data.description}</p>
+    <>
+      <header className="page-header">
+        <h2 id="course-title">{data.title}</h2>
+        <p>{data.description}</p>
+      </header>
 
-      <section aria-label="Objectives" className="vertical-stack">
-        <h3>Objectives</h3>
+      <section aria-labelledby="objectives-heading" className="vertical-stack">
+        <h3 id="objectives-heading">Objectives</h3>
         <ul>
           {data.objectives.map((objective) => (
             <li key={objective}>{objective}</li>
@@ -29,8 +26,8 @@ export default function CourseDetail() {
         </ul>
       </section>
 
-      <section aria-label="Resources" className="vertical-stack">
-        <h3>Resources</h3>
+      <section aria-labelledby="resources-heading" className="vertical-stack">
+        <h3 id="resources-heading">Resources</h3>
         <ul>
           {data.resources.map((resource) => (
             <li key={resource}>{resource}</li>
@@ -39,9 +36,35 @@ export default function CourseDetail() {
       </section>
 
       <figure>
-        <img src={data.image} alt={`${data.title} reference`} loading="lazy" />
+        <img
+          src={data.image}
+          alt={`${data.title} reference`}
+          loading="lazy"
+          style={{ maxWidth: "100%", height: "auto", borderRadius: "0.5rem" }}
+        />
         <figcaption>Course moodboard</figcaption>
       </figure>
+    </>
+  );
+}
+
+export default function CourseDetail() {
+  const [match, params] = useRoute("/courses/:id");
+  const courseId = params?.id ?? "";
+
+  if (!match) {
+    return (
+      <article>
+        <p>Course not found</p>
+      </article>
+    );
+  }
+
+  return (
+    <article aria-labelledby="course-title">
+      <Suspense fallback={<ListSkeleton count={3} />}>
+        <CourseContent courseId={courseId} />
+      </Suspense>
     </article>
   );
 }
