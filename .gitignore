@@ -38,6 +38,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+server.log
 
 # Runtime data
 pids
@@ -104,3 +105,11 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# User uploads
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Storage data (optional - remove if you want to commit data)
+server/storage/*.json
+!server/storage/.gitkeep
