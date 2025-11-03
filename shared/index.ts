@@ -1,2 +1,2 @@
-export * from "./types/resource";
-export * from "./data/resources";
+export * from "./types/index.js";
+export * from "./data/index.js";

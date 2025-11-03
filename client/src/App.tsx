@@ -1,29 +1,40 @@
 import { Route, Switch } from "wouter";
-import { Resources } from "@/pages/Resources";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
+import CoursePage from "@/routes/courses/[id]";
+import HomePage from "@/routes/home";
+import WorkflowPage from "@/routes/workflow";
 
-export default function App() {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <QueryClientProvider client={queryClient}>
       <Switch>
-        <Route path="/resources" component={Resources} />
-        <Route path="/">
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold mb-4">数字设计构成</h1>
-            <p className="text-muted-foreground mb-4">
-              欢迎来到数字设计构成学习平台
-            </p>
-            <a href="/resources" className="text-primary hover:underline">
-              前往学习资源库 →
-            </a>
-          </div>
-        </Route>
+        <Route path="/" component={HomePage} />
+        <Route path="/courses/:id" component={CoursePage} />
+        <Route path="/workflow" component={WorkflowPage} />
         <Route>
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold mb-4">404</h1>
-            <p className="text-muted-foreground">页面未找到</p>
-          </div>
+          {() => (
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold mb-4">404</h1>
+                <p className="text-muted-foreground">页面未找到</p>
+              </div>
+            </div>
+          )}
         </Route>
       </Switch>
-    </div>
+      <Toaster />
+    </QueryClientProvider>
   );
 }
+
+export default App;

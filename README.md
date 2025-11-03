@@ -1,140 +1,293 @@
-# 数字设计构成 - Digital Design Composition
+# Digital Design Composition
 
-数字设计构成课程的学习资源平台，提供结构化的阅读资源库和交互式学习工具。
+A progressive web application for digital design education, built with React 18, TypeScript, Vite, and Express.
 
-## 功能特性
+## Features
 
-### 学习资源库 (/resources)
+- 🎯 **Course Management**: 12-week curriculum with progressive lessons
+- 📚 **Knowledge Cards**: Flashcards for design concepts and theory
+- 📖 **Case Library**: Filterable gallery of design exemplars
+- 🤖 **Prompt Studio**: AI prompt editor for generative design
+- 📝 **Assignments**: Project submission and feedback system
 
-- **资源分类**: 将书籍分为"必读经典"和"当代视角"两个部分
-- **完整元数据**: 每个资源包含标题、作者、年份、摘要、推荐理由、外部链接和标签
-- **阅读状态管理**: 支持标记资源为"未读"、"想读"、"在读"、"已读"
-- **状态持久化**: 阅读状态保存在浏览器本地存储，刷新页面后保持
-- **筛选功能**:
-  - 按标签筛选（如：康定斯基、点线面、包豪斯等）
-  - 按作者筛选
-  - 按阅读状态筛选
-  - 全文搜索
-- **URL状态同步**: 筛选条件保存在URL中，支持分享和书签
-- **快捷操作**:
-  - 一键复制引用格式
-  - 打开外部链接
-  - 添加和编辑个人笔记
-- **响应式设计**: 移动端列表布局，桌面端网格布局
-- **统计面板**: 显示各阅读状态的资源数量
+## Tech Stack
 
-## 技术栈
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for blazing-fast development
+- **Tailwind CSS 4** for styling
+- **shadcn/ui** component library
+- **Wouter** for lightweight routing
+- **TanStack Query** for data fetching
+- **Framer Motion** for animations
 
-- **前端**: React 18.3 + TypeScript 5.6
-- **构建工具**: Vite 7
-- **路由**: Wouter
-- **样式**: Tailwind CSS 4
-- **UI组件**: shadcn/ui (基于 Radix UI)
-- **图标**: Lucide React
-- **后端**: Express (生产环境)
+### Backend
+- **Express** server
+- **esbuild** for server bundling
+- TypeScript with ESM
 
-## 开发
+### Testing & Quality
+- **Vitest** for unit/integration tests
+- **Testing Library** for component testing
+- **Supertest** for API testing
+- **Axe** for accessibility auditing (dev only)
+- **Web Vitals** for performance monitoring
 
-### 安装依赖
+## Getting Started
 
-```bash
-npm install --legacy-peer-deps
-```
+### Prerequisites
 
-### 启动开发服务器
+- Node.js 18+ 
+- pnpm 8+
 
-```bash
-npm run dev
-```
+### Installation
 
-访问 http://localhost:3000
+\`\`\`bash
+# Install dependencies
+pnpm install
 
-### 构建生产版本
+# Copy environment file (if needed)
+cp .env.example .env
+\`\`\`
 
-```bash
-npm run build
-```
+### Development
 
-### 类型检查
+\`\`\`bash
+# Start dev server (Vite on port 3000)
+pnpm dev
 
-```bash
-npm run check
-```
+# Type-check without emitting
+pnpm check
 
-### 代码格式化
+# Format code
+pnpm format
+\`\`\`
 
-```bash
-npm run format
-```
+The dev server includes:
+- Hot module replacement (HMR)
+- Automatic accessibility auditing with axe-core
+- React Query DevTools
 
-## 项目结构
+### Testing
 
-```
+\`\`\`bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Generate coverage report
+pnpm test:coverage
+\`\`\`
+
+**Coverage targets**: ≥80% statements, ≥75% branches, ≥80% functions, ≥80% lines
+
+### Building for Production
+
+\`\`\`bash
+# Build client and server
+pnpm build
+
+# Start production server
+pnpm start
+\`\`\`
+
+Build output:
+- Client bundle: \`dist/public/\`
+- Server bundle: \`dist/index.js\`
+
+## Project Structure
+
+\`\`\`
 .
-├── client/                 # 前端代码
-│   ├── src/
-│   │   ├── components/     # React组件
-│   │   │   ├── ui/        # shadcn UI组件
-│   │   │   └── ResourceCard.tsx
-│   │   ├── pages/         # 页面组件
-│   │   │   └── Resources.tsx
-│   │   ├── hooks/         # 自定义Hooks
-│   │   │   └── useResourceState.ts
-│   │   ├── lib/           # 工具函数
-│   │   │   └── utils.ts
-│   │   ├── App.tsx        # 主应用组件
-│   │   ├── main.tsx       # 入口文件
-│   │   └── index.css      # 全局样式
-│   └── index.html         # HTML模板
-├── server/                # 后端代码
-│   └── index.ts          # Express服务器
-├── shared/               # 前后端共享代码
-│   ├── types/           # TypeScript类型定义
-│   │   └── resource.ts
-│   └── data/            # 数据
-│       └── resources.ts
-└── dist/                # 构建输出
-```
+├── client/
+│   ├── index.html
+│   └── src/
+│       ├── components/      # Reusable UI components
+│       ├── pages/           # Route-level components (lazy-loaded)
+│       ├── hooks/           # Custom React hooks
+│       ├── lib/             # Utilities (analytics, utils)
+│       ├── test/            # Test setup files
+│       ├── App.tsx          # Root component with routing
+│       ├── main.tsx         # Entry point
+│       └── styles.css       # Global styles
+├── server/
+│   └── index.ts             # Express server with API routes
+├── shared/
+│   ├── types.ts             # Shared TypeScript types
+│   └── data.ts              # Mock/seed data
+├── tests/
+│   ├── components/          # Component tests
+│   └── server.test.ts       # API tests
+└── ...config files
+\`\`\`
 
-## 数据结构
+## Performance Optimizations
 
-### Resource (资源)
+### Implemented
+- ✅ Route-level code splitting with \`React.lazy\`
+- ✅ Suspense boundaries for async components
+- ✅ Skeleton loaders for perceived performance
+- ✅ Image lazy-loading via \`loading="lazy"\`
+- ✅ Data prefetching on hover/focus (TanStack Query)
+- ✅ Web Vitals monitoring (CLS, FCP, FID, INP, LCP, TTFB)
 
-```typescript
-{
-  id: string;              // 唯一标识
-  title: string;           // 标题
-  author: string;          // 作者
-  year: number;           // 出版年份
-  summary: string;        // 摘要
-  recommendationReason: string; // 推荐理由
-  externalLink: string;   // 外部链接
-  tags: string[];         // 标签
-  section: "必读经典" | "当代视角"; // 分类
-}
-```
+### Bundle Analysis
 
-### ReadingState (阅读状态)
+\`\`\`bash
+# Analyze bundle size
+pnpm build --stats
+npx vite-bundle-visualizer
+\`\`\`
 
-- `未读`: 尚未阅读
-- `想读`: 计划阅读
-- `在读`: 正在阅读
-- `已读`: 已完成阅读
+**Target**: Lighthouse score ≥90 on desktop/mobile for key pages
 
-## 可访问性
+## Accessibility
 
-- 所有交互元素都有适当的 ARIA 标签
-- 支持键盘导航（Tab、Enter、Space）
-- 焦点可见状态
-- 屏幕阅读器友好
-- 响应式设计，最小支持 360px 宽度
+### Standards
+- WCAG 2.1 AA compliance
+- Semantic HTML5 landmarks
+- ARIA roles and labels
+- Keyboard navigation (Tab, Enter, Escape)
+- Skip links for main content
+- Focus indicators (3px solid outline)
 
-## 浏览器支持
+### Auditing
 
-- Chrome/Edge (最新版本)
-- Firefox (最新版本)
-- Safari (最新版本)
+\`\`\`bash
+# Dev mode automatically runs axe-core
+pnpm dev
+
+# Manual audit (requires Lighthouse CLI)
+npm i -g @lhci/cli
+lhci autorun
+\`\`\`
+
+**Critical issues**: Must be resolved before production
+
+## Testing Strategy
+
+### Component Tests
+- Skeleton loaders (rendering, accessibility)
+- Navigation (routing, active states)
+- Error boundaries (error handling)
+
+### Integration Tests
+- Course detail flow (data fetching, display)
+- Prompt editor interactions
+- Assignment form validation
+
+### API Tests (Supertest)
+- Course outline endpoint
+- Course detail endpoint
+- Analytics endpoints
+
+### E2E Tests (Future)
+- Playwright for smoke tests
+- Responsive breakpoints (mobile, tablet, desktop)
+
+## Scripts Reference
+
+| Script | Description |
+|--------|-------------|
+| \`pnpm dev\` | Start Vite dev server |
+| \`pnpm build\` | Build client + server for production |
+| \`pnpm start\` | Run production server |
+| \`pnpm preview\` | Preview production build locally |
+| \`pnpm check\` | Type-check all TypeScript files |
+| \`pnpm format\` | Format code with Prettier |
+| \`pnpm test\` | Run all tests |
+| \`pnpm test:watch\` | Run tests in watch mode |
+| \`pnpm test:coverage\` | Generate coverage report |
+
+## Environment Variables
+
+\`\`\`bash
+# .env
+PORT=3001                      # Server port
+NODE_ENV=development           # Environment (development|production|test)
+VITE_API_BASE_URL=/api         # API base URL for client
+\`\`\`
+
+## Known Limitations
+
+1. **Authentication**: No user login/session management yet
+2. **Database**: Mock data only; no persistence layer
+3. **File Uploads**: Assignment submissions are URL-based
+4. **Internationalization**: Chinese/English content mixed; no i18n framework
+5. **Analytics**: Web Vitals logged but not aggregated/visualized
+6. **Offline Support**: No service worker or PWA manifest
+
+## CI/CD
+
+### GitHub Actions Workflow
+
+Create \`.github/workflows/ci.yml\`:
+
+\`\`\`yaml
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test:coverage
+      - run: pnpm build
+\`\`\`
+
+### Pre-commit Hooks (Optional)
+
+\`\`\`bash
+# Install husky
+pnpm add -D husky lint-staged
+
+# Initialize
+npx husky init
+
+# Add pre-commit hook
+echo "pnpm check && pnpm format" > .husky/pre-commit
+\`\`\`
+
+## Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (\`git checkout -b feature/amazing-feature\`)
+3. **Commit** your changes (\`git commit -m 'Add amazing feature'\`)
+4. **Push** to the branch (\`git push origin feature/amazing-feature\`)
+5. **Open** a Pull Request
+
+### Code Style
+- Use **TypeScript** for all new files
+- Follow **Prettier** formatting (auto-format on commit)
+- Write **tests** for new features (≥80% coverage)
+- Add **accessibility** attributes (ARIA, semantic HTML)
 
 ## License
 
 MIT
+
+## Support
+
+For questions or issues, please open a GitHub issue or contact the development team.
+
+---
+
+**Last Updated**: 2024-11  
+**Version**: 1.0.0
