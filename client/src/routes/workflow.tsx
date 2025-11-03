@@ -10,7 +10,7 @@ import { BauhausAnalysisTutorial } from "@/components/workflow/BauhausAnalysisTu
 import { ProgressMeter } from "@/components/workflow/ProgressMeter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
-  WorkflowStep,
+  WorkflowDetailStep,
   JanGehlStage,
   ToolRecommendation,
   DownloadableTemplate,
@@ -22,7 +22,7 @@ export default function WorkflowPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("steps");
 
-  const { data: steps = [] } = useQuery<WorkflowStep[]>({
+  const { data: steps = [] } = useQuery<WorkflowDetailStep[]>({
     queryKey: ["workflow-steps"],
     queryFn: async () => {
       const { data } = await axios.get("/api/workflow/steps");

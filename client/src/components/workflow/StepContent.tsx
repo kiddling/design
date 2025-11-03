@@ -3,11 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, BookOpen } from "lucide-react";
-import type { WorkflowStep } from "@shared/types/workflow";
+import type { WorkflowDetailStep } from "@shared/types/workflow";
 import { cn } from "@/lib/utils";
 
 interface StepContentProps {
-  step: WorkflowStep;
+  step: WorkflowDetailStep;
   completedItems: string[];
   onChecklistToggle: (itemId: string) => void;
   onNext?: () => void;

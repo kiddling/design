@@ -1,10 +1,10 @@
-export interface WorkflowStep {
+export interface WorkflowDetailStep {
   id: string;
   title: string;
   description: string;
   order: number;
   checklist: ChecklistItem[];
-  media?: MediaItem[];
+  media?: WorkflowMediaItem[];
   guidance: string;
 }
 
@@ -14,7 +14,7 @@ export interface ChecklistItem {
   completed: boolean;
 }
 
-export interface MediaItem {
+export interface WorkflowMediaItem {
   type: "image" | "video";
   src: string;
   alt: string;
@@ -26,7 +26,7 @@ export interface JanGehlStage {
   title: string;
   description: string;
   content: string;
-  examples: MediaItem[];
+  examples: WorkflowMediaItem[];
   tips: string[];
 }
 

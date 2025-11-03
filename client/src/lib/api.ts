@@ -1,6 +1,6 @@
 import axios from "axios";
-import type { Course, UserProgress } from "@shared/types/course";
-import type { Assignment } from "@shared/types";
+import type { CourseOverview } from "@shared/types/course";
+import type { Assignment, UserProgress } from "@shared/types";
 
 const API_BASE_URL = import.meta.env.PROD ? "/api" : "http://localhost:5000/api";
 
@@ -12,8 +12,8 @@ export const api = axios.create({
 });
 
 export const courseApi = {
-  getCourses: () => api.get<Course[]>("/courses"),
-  getCourseById: (id: string) => api.get<Course>(`/courses/${id}`),
+  getCourses: () => api.get<CourseOverview[]>("/courses"),
+  getCourseById: (id: string) => api.get<CourseOverview>(`/courses/${id}`),
   getProgress: (courseId: string) =>
     api.get<UserProgress>(`/courses/${courseId}/progress`),
   updateProgress: (courseId: string, completedSections: string[]) =>

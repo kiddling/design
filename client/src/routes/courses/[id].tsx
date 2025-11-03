@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RichText } from "@/components/course/RichText";
 import { CourseNavigation } from "@/components/course/CourseNavigation";
-import type { CourseSection } from "@shared/types/course";
+import type { CourseOverviewSection } from "@shared/types/course";
 
 export default function CoursePage() {
   const [, params] = useRoute("/courses/:id");

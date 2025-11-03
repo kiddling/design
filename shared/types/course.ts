@@ -1,15 +1,15 @@
-export interface Course {
+export interface CourseOverview {
   id: string;
   title: string;
   subtitle?: string;
   description: string;
   duration: string;
   objectives: string[];
-  sections: CourseSection[];
+  sections: CourseOverviewSection[];
   metadata: CourseMetadata;
 }
 
-export interface CourseSection {
+export interface CourseOverviewSection {
   id: string;
   type: SectionType;
   title: string;
@@ -120,7 +120,7 @@ export interface CourseMetadata {
   relatedCourses?: string[];
 }
 
-export interface UserProgress {
+export interface CourseProgress {
   userId: string;
   courseId: string;
   completedSections: string[];

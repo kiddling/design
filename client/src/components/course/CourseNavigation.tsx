@@ -7,10 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { CourseSection } from "@shared/types/course";
+import type { CourseOverviewSection } from "@shared/types/course";
 
 interface CourseNavigationProps {
-  sections: CourseSection[];
+  sections: CourseOverviewSection[];
   activeSection: string;
   onNavigate: (sectionId: string) => void;
 }

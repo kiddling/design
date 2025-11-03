@@ -1,11 +1,11 @@
 import type {
-  WorkflowStep,
+  WorkflowDetailStep,
   JanGehlStage,
   ToolRecommendation,
   DownloadableTemplate,
 } from "../types/workflow.js";
 
-export const workflowSteps: WorkflowStep[] = [
+export const workflowSteps: WorkflowDetailStep[] = [
   {
     id: "observe",
     title: "观察 · 城市空间观察",

@@ -1,6 +1,6 @@
-import type { Course } from "../types/course";
+import type { CourseOverview } from "../types/course";
 
-export const courses: Course[] = [
+export const courses: CourseOverview[] = [
   {
     id: "guan-yuan-su-jie-gou",
     title: "观·元素解构",
