@@ -9,10 +9,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(express.static(join(__dirname, "../dist/public")));
+app.use(express.static(join(__dirname, "../dist/client")));
 
 app.get("*", (_req, res) => {
-  res.sendFile(join(__dirname, "../dist/public/index.html"));
+  res.sendFile(join(__dirname, "../dist/client/index.html"));
 });
 
 app.listen(PORT, () => {
