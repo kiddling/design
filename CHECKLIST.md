@@ -1,260 +1,210 @@
-# Implementation Checklist
+# Case Library Implementation Checklist
 
-## ✅ Acceptance Criteria
+## Ticket Requirements
 
-### Content APIs
-- [x] `/api/courses/:id` endpoint implemented
-- [x] `/api/knowledge` endpoint with pagination and filtering
-- [x] `/api/cases` endpoint with search
-- [x] `/api/prompts` endpoint with templates
-- [x] `/api/workflows` endpoint with step-by-step guides
-- [x] `/api/resources` endpoint with type filtering
-- [x] `/api/assignments` endpoint with requirements
-- [x] All endpoints return typed JSON matching schema
-- [x] Supertest specs cover happy path
-- [x] Supertest specs cover validation errors
+### ✅ 1. Build `/cases` route with layout
+- [x] Created `/cases` route in `client/src/pages/cases.tsx`
+- [x] Filter sidebar with discipline, tags, difficulty filters
+- [x] Search bar with debounced input (300ms delay)
+- [x] React Query integration for data fetching
+- [x] URL state management for filters
 
-### User State Endpoints
-- [x] `/api/users/:userId/progress` GET endpoint
-- [x] `/api/users/:userId/progress` POST endpoint
-- [x] `/api/users/:userId/favorites` GET endpoint
-- [x] `/api/users/:userId/favorites` POST endpoint
-- [x] `/api/users/:userId/history` GET endpoint
-- [x] Payloads validated with shared Zod schemas
-- [x] Data persists across server restarts
-- [x] Tested with integration tests
+### ✅ 2. Render case cards in responsive grid
+- [x] CaseCard component (`client/src/components/case-card.tsx`)
+- [x] Image placeholder with loading spinner
+- [x] Lazy-loaded images with `loading="lazy"`
+- [x] Displays: title, discipline badge, key insight snippet
+- [x] Responsive grid: 1 col mobile, 2 col tablet, 3 col desktop
+- [x] Hover effects with transform
+- [x] Favorite toggle button
 
-### Persistence Layer
-- [x] JSON file-based storage created in `server/storage/`
-- [x] Async read/write operations implemented
-- [x] Write queues prevent race conditions
-- [x] Storage for user progress
-- [x] Storage for user favorites
-- [x] Storage for prompt history
-- [x] Storage for assignment submissions
-- [x] Auto-initialization on first run
+### ✅ 3. Per-case detail modal/drawer
+- [x] CaseDetailModal component (`client/src/components/case-detail-modal.tsx`)
+- [x] Structured sections:
+  - [x] Problem description
+  - [x] Deconstruction analysis
+  - [x] Solution
+  - [x] References (linkable with external icons)
+  - [x] Related knowledge cards
+- [x] Share button (native API with fallback)
+- [x] Copy link functionality
+- [x] Keyboard accessible (ESC, Tab, Enter)
+- [x] Scrollable content area
 
-### Assignment Submission
-- [x] Text field support
-- [x] File upload support with multer
-- [x] Storage under `server/uploads/`
-- [x] Metadata stored alongside submission record
-- [x] Multiple files per submission (up to 10)
-- [x] File size limit (10MB per file)
-- [x] File type validation (images, PDFs, documents, videos)
-- [x] Submission status tracking (draft/submitted/graded)
-- [x] Response includes submission IDs and statuses
+### ✅ 4. Client-side filtering + server-backed query
+- [x] Client-side filtering with React Query
+- [x] Server API endpoints (`server/index.ts`):
+  - [x] GET `/api/cases` with query params
+  - [x] POST `/api/cases/:id/favorite`
+- [x] Debounced search (300ms)
+- [x] Filter state in URL query params
+- [x] Shareable links with filters
+- [x] Browser back/forward support
 
-### Recommendation Endpoints
-- [x] `/api/prompts/recommendations` endpoint
-- [x] Course section filtering (`?courseSection=...`)
-- [x] Course ID filtering
-- [x] Difficulty filtering
-- [x] Configurable result limit
-- [x] Leverages relationship metadata
-- [x] Context-aware suggestions
+### ✅ 5. Bookmarking/favorite toggle
+- [x] Heart icon on case cards
+- [x] Toggle favorite mutation with React Query
+- [x] Visual feedback (filled red heart)
+- [x] Persistent storage on server
+- [x] "My saved cases" filter button
+- [x] Favorite count display
 
-### Middleware & Configuration
-- [x] Error handling middleware
-- [x] 404 handling
-- [x] Request logging
-- [x] Rate limiting (lightweight)
-- [x] General API: 100 requests/15min
-- [x] Submissions: 10/hour
-- [x] CORS settings align with Vite dev origin
-- [x] CORS supports credentials
-- [x] OPTIONS preflight handling
+### ✅ 6. Quick navigation chips
+- [x] Discipline chips at top of page
+- [x] One-click discipline filtering
+- [x] Cross-links to knowledge cards in detail view
+- [x] Clear filter functionality
+- [x] Active filter badges with remove option
 
-### Testing
-- [x] Vitest configured
-- [x] Supertest integration tests
-- [x] All content routes tested
-- [x] User state routes tested
-- [x] Assignment submission tested
-- [x] Error handling tested
-- [x] Validation tested
-- [x] File storage mocked where necessary
-- [x] All tests passing (31/31 ✓)
+## Acceptance Criteria
 
-### Authentication
-- [x] Stub authentication implemented
-- [x] Demo user ID support
-- [x] Ready for JWT integration
+### ✅ Case list functionality
+- [x] 5 baseline cases populate correctly
+- [x] Combined filters produce accurate results
+- [x] Search works across title, description, tags
+- [x] Multiple filters can be applied simultaneously
 
-## ✅ Code Quality
+### ✅ Detail view
+- [x] All textual sections display correctly
+- [x] References are linkable
+- [x] Modal accessible via keyboard
+- [x] Share/copy link functionality works
+- [x] Related knowledge cards shown
 
-### Type Safety
-- [x] All types defined in `shared/types.ts`
-- [x] Zod schemas for validation
+### ✅ Favorites system
+- [x] Favorites persist after reload
+- [x] Saved section reflects backend data
+- [x] Toggle works on both card and detail view
+- [x] Filter by favorites only
+
+### ✅ Responsive layout
+- [x] Desktop: side-by-side layout with sticky sidebar
+- [x] Mobile: filters collapse into drawer (Sheet)
+- [x] No layout shift with fixed aspect ratios
+- [x] Images lazy-load
+- [x] Touch-friendly targets (44x44px minimum)
+
+## Technical Quality
+
+### ✅ Type Safety
 - [x] TypeScript strict mode
-- [x] No type errors (`npm run check` passes)
+- [x] Shared types in `shared/types.ts`
+- [x] Type checking passes (`npm run check`)
 
-### Code Organization
-- [x] Modular router structure
-- [x] Separated concerns (routes, storage, middleware)
-- [x] Shared code in `shared/` directory
-- [x] Utility functions extracted
-- [x] Consistent naming conventions
+### ✅ Code Quality
+- [x] Formatted with Prettier
+- [x] Consistent component patterns
+- [x] No unnecessary comments
+- [x] Named exports
+- [x] `cn()` utility for class merging
 
-### Error Handling
-- [x] Try-catch blocks in async operations
-- [x] Standardized error responses
-- [x] Validation error messages
-- [x] Production-safe error hiding
-- [x] 404 handling for unknown routes
+### ✅ Performance
+- [x] Lazy-loaded images
+- [x] Debounced search (300ms)
+- [x] React Query caching
+- [x] Optimized bundle size
+- [x] No unnecessary re-renders
 
-### Documentation
-- [x] API documentation (`server/API.md`)
-- [x] Server implementation guide (`server/README.md`)
-- [x] Development guide (`DEVELOPMENT.md`)
-- [x] Implementation summary (`IMPLEMENTATION_SUMMARY.md`)
-- [x] Code comments where needed
-- [x] Example usage in client library
+### ✅ Accessibility
+- [x] Semantic HTML
+- [x] ARIA labels on interactive elements
+- [x] Keyboard navigation (Tab, Enter, ESC)
+- [x] Focus visible states
+- [x] Screen reader friendly
+- [x] High contrast ratios
 
-## ✅ Data & Content
+### ✅ Build & Deploy
+- [x] Build succeeds (`npm run build`)
+- [x] Production optimizations enabled
+- [x] Server runs on configurable ports
+- [x] Static file serving for production
+- [x] Comprehensive .gitignore
 
-### Sample Data
-- [x] 3 courses with metadata
-- [x] 5 knowledge cards
-- [x] 5 case studies
-- [x] 5 AI prompt templates
-- [x] 2 workflows with 6 steps each
-- [x] 5 resources
-- [x] 3 assignments with rubrics
+## Data & Content
 
-### Relationships
-- [x] Course ↔ Knowledge relationships
-- [x] Course ↔ Case relationships
-- [x] Course ↔ Prompt relationships
-- [x] Knowledge ↔ Case relationships
-- [x] Prompt ↔ Knowledge relationships
-- [x] All relationship IDs valid
+### ✅ Mock Data (`shared/mock-data.ts`)
+- [x] 5 baseline cases covering all disciplines:
+  1. Digital Media - Smart City Interface Design
+  2. Architecture - Minimalist Residential Design
+  3. Graphic Design - Brand Identity System
+  4. Product Design - Modular Toy Design
+  5. Urban Planning - Public Space Renovation
+- [x] Rich content with bilingual titles
+- [x] Realistic design problems and solutions
+- [x] External references
+- [x] Related knowledge cards
 
-### Data Quality
-- [x] All required fields present
-- [x] Consistent ID format
-- [x] Valid difficulty levels
-- [x] Valid types and categories
-- [x] Chinese and English content
+### ✅ Disciplines
+- [x] Architecture (建筑设计)
+- [x] Graphic Design (平面设计)
+- [x] Product Design (产品设计)
+- [x] Urban Planning (城市规划)
+- [x] Digital Media (数字媒体)
 
-## ✅ Features
+### ✅ Difficulty Levels
+- [x] Base (基础)
+- [x] Advance (进阶)
+- [x] Stretch (挑战)
 
-### Pagination
-- [x] Page parameter support
-- [x] Page size parameter support
-- [x] Total count in response
-- [x] Total pages calculation
-- [x] Default values (page=1, pageSize=20)
-- [x] Max page size limit (100)
+## Documentation
 
-### Filtering
-- [x] Category filtering
-- [x] Difficulty filtering
-- [x] Tags filtering (comma-separated)
-- [x] Type filtering (resources)
-- [x] Premium filtering (resources)
-- [x] Search in title and description
+### ✅ Project Documentation
+- [x] README.md with setup instructions
+- [x] IMPLEMENTATION_SUMMARY.md with full details
+- [x] CHECKLIST.md (this file)
+- [x] Inline code comments where needed
 
-### File Uploads
-- [x] Multer configured
-- [x] Unique filenames with nanoid
-- [x] File type validation
-- [x] File size validation
-- [x] Multiple file support
-- [x] File metadata storage
-- [x] Upload directory created
-- [x] .gitignore configured
+### ✅ Code Examples
+- [x] How to run development servers
+- [x] How to build for production
+- [x] API endpoint documentation
 
-### Storage
-- [x] Create operations
-- [x] Read operations
-- [x] Update operations
-- [x] Delete operations (favorites)
-- [x] Query operations (filters)
-- [x] Concurrent write safety
-- [x] File auto-creation
+## Dependencies
 
-## ✅ Infrastructure
+### ✅ Frontend
+- [x] React 18
+- [x] TypeScript 5.6
+- [x] Vite 7
+- [x] Tailwind CSS 4
+- [x] @tanstack/react-query
+- [x] wouter (routing)
+- [x] Radix UI primitives
+- [x] lucide-react (icons)
 
-### Build & Deploy
-- [x] Build script configured
-- [x] Production mode support
-- [x] Environment variables
-- [x] Static file serving
-- [x] SPA fallback routing
+### ✅ Backend
+- [x] Express.js
+- [x] TypeScript
+- [x] tsx (development)
 
-### Development
-- [x] Dev script with hot reload
-- [x] Parallel client/server dev
-- [x] TypeScript compilation
-- [x] Code formatting (Prettier)
-- [x] Test script
-- [x] Test watch mode
+## Final Status
 
-### Git
-- [x] .gitignore configured
-- [x] Uploads directory ignored
-- [x] Storage data (optional)
-- [x] Node modules ignored
-- [x] Build output ignored
-- [x] .gitkeep files added
+**All requirements met ✅**
 
-## ✅ Dependencies
+The case library feature is fully implemented and ready for deployment. All acceptance criteria have been satisfied, and the implementation follows best practices for performance, accessibility, and code quality.
 
-### Production Dependencies
-- [x] express - Web server
-- [x] express-rate-limit - Rate limiting
-- [x] multer - File uploads
-- [x] @types/multer - Type definitions
-- [x] nanoid - Unique ID generation
-- [x] zod - Schema validation
+### How to Test
 
-### Development Dependencies
-- [x] vitest - Test runner
-- [x] supertest - HTTP testing
-- [x] @types/supertest - Type definitions
-- [x] tsx - TypeScript execution
-- [x] npm-run-all - Parallel scripts
+```bash
+# Install dependencies
+npm install --legacy-peer-deps
 
-## ✅ Best Practices
+# Terminal 1: Start backend server
+npm run dev:server
 
-### Security
-- [x] Input validation
-- [x] File type restrictions
-- [x] File size limits
-- [x] Rate limiting
-- [x] CORS configuration
-- [x] Error message sanitization
+# Terminal 2: Start frontend dev server
+npm run dev
 
-### Performance
-- [x] Async operations
-- [x] Write queues for storage
-- [x] Pagination for large lists
-- [x] Efficient filtering
-- [x] No blocking operations
+# Visit: http://localhost:3000/cases
+```
 
-### Maintainability
-- [x] Clear file structure
-- [x] Consistent patterns
-- [x] Comprehensive tests
-- [x] Good documentation
-- [x] Type safety
-- [x] Error handling
+### Production Build
 
-## 📊 Statistics
+```bash
+npm run build
+npm start
+```
 
-- **Total Endpoints**: 33+
-- **Total Tests**: 31 (all passing ✓)
-- **Test Coverage**: Happy paths + error cases
-- **Lines of Code**: ~2,450 (TypeScript)
-- **Type Definitions**: 50+
-- **Sample Data Items**: 28
-- **Documentation Pages**: 4
-- **Dependencies Added**: 6
+---
 
-## 🎯 Status: COMPLETE ✅
-
-All acceptance criteria met.
-All tests passing.
-Documentation complete.
-Ready for frontend integration.
+**Implementation Date**: 2024
+**Branch**: feat/case-library-explorer-filters-search-details

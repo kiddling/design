@@ -1,296 +1,177 @@
-import { Router } from "express";
+import express from "express";
 import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
+import path from "node:path";
 import { nanoid } from "nanoid";
-import { assignments } from "@shared/data/assignments";
+import type { Submission, SubmissionFile, UserProgress } from "@shared/types";
 import {
-  createSubmissionSchema,
-  updateSubmissionSchema,
-} from "@shared/schemas";
-import {
+  getAssignmentById,
+  getAssignments,
+  getSubmissions,
+  getUserProgress,
   saveSubmission,
-  getSubmissionById,
-  getUserAssignmentSubmission,
-  getUserSubmissions,
-  getAssignmentSubmissions,
-} from "../storage/index";
-import type {
-  Assignment,
-  AssignmentSubmission,
-  ApiResponse,
-  SubmissionFile,
-} from "@shared/types";
+  saveUserProgress,
+} from "../data/assignments.js";
+import { ensureStorageDirectory } from "../utils/storage.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const router = express.Router();
 
-const router = Router();
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    const uploadPath = path.resolve(__dirname, "../uploads");
-    cb(null, uploadPath);
+const uploadStorage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const assignmentId = req.params.id ?? "general";
+    const dir = ensureStorageDirectory("uploads", assignmentId);
+    cb(null, dir);
   },
   filename: (_req, file, cb) => {
-    const uniqueName = `${nanoid()}-${file.originalname}`;
+    const ext = path.extname(file.originalname);
+    const uniqueName = `${Date.now()}-${nanoid(8)}${ext}`;
     cb(null, uniqueName);
   },
 });
 
 const upload = multer({
-  storage,
+  storage: uploadStorage,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (_req, file, cb) => {
-    // Allow images, PDFs, and common document formats
-    const allowedMimes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "video/mp4",
-      "video/quicktime",
-    ];
-
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error(`File type ${file.mimetype} not allowed`));
-    }
+    fileSize: 25 * 1024 * 1024,
+    files: 10,
   },
 });
 
-// Get all assignments
+const FIELD_TYPE_MAP: Record<string, SubmissionFile["type"]> = {
+  photos: "photo",
+  diagram: "diagram",
+  attachments: "document",
+};
+
 router.get("/", (_req, res) => {
-  const response: ApiResponse<Assignment[]> = {
-    success: true,
-    data: assignments,
-  };
-  res.json(response);
-});
-
-// Get assignment by ID
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  const assignment = assignments.find(a => a.id === id);
-
-  if (!assignment) {
-    const response: ApiResponse<never> = {
-      success: false,
-      error: "Assignment not found",
-    };
-    return res.status(404).json(response);
+  try {
+    const assignments = getAssignments();
+    res.json(assignments);
+  } catch (error) {
+    console.error("Error fetching assignments:", error);
+    res.status(500).json({ error: "Failed to fetch assignments" });
   }
-
-  const response: ApiResponse<Assignment> = {
-    success: true,
-    data: assignment,
-  };
-  res.json(response);
 });
 
-// Get assignment submissions (all or by assignment ID)
-router.get("/:id/submissions", async (req, res) => {
+router.get("/:id", (req, res) => {
+  try {
+    const assignment = getAssignmentById(req.params.id);
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found" });
+    }
+    res.json(assignment);
+  } catch (error) {
+    console.error("Error fetching assignment:", error);
+    res.status(500).json({ error: "Failed to fetch assignment" });
+  }
+});
+
+router.get("/:id/submissions", (req, res) => {
   try {
     const { id } = req.params;
-    const submissions = await getAssignmentSubmissions(id);
+    const userId = (req.query.userId as string) || "default-user";
 
-    const response: ApiResponse<AssignmentSubmission[]> = {
-      success: true,
-      data: submissions,
-    };
-    res.json(response);
+    const submissions = getSubmissions(id, userId);
+    res.json(submissions);
   } catch (error) {
-    const response: ApiResponse<never> = {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to fetch submissions",
-    };
-    res.status(500).json(response);
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ error: "Failed to fetch submissions" });
   }
 });
 
-// Create or update a submission
-router.post("/:id/submit", upload.array("files", 10), async (req, res) => {
-  try {
-    const { id: assignmentId } = req.params;
-    const userId = req.body.userId || "demo-user"; // Stub auth
+router.post(
+  "/:id/submissions",
+  upload.fields([
+    { name: "photos", maxCount: 5 },
+    { name: "diagram", maxCount: 2 },
+    { name: "attachments", maxCount: 5 },
+  ]),
+  (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = (req.body.userId as string) || "default-user";
 
-    // Check if assignment exists
-    const assignment = assignments.find(a => a.id === assignmentId);
-    if (!assignment) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: "Assignment not found",
-      };
-      return res.status(404).json(response);
-    }
-
-    // Parse text fields from body
-    const fieldsData = req.body.fields ? JSON.parse(req.body.fields) : [];
-    const statusData = req.body.status || "draft";
-
-    // Validate submission data
-    const validationResult = createSubmissionSchema.safeParse({
-      assignmentId,
-      status: statusData,
-      fields: fieldsData,
-    });
-
-    if (!validationResult.success) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: validationResult.error.message,
-      };
-      return res.status(400).json(response);
-    }
-
-    // Check if submission already exists
-    const existingSubmission = await getUserAssignmentSubmission(
-      userId,
-      assignmentId
-    );
-
-    // Process uploaded files
-    const files: SubmissionFile[] = [];
-    if (req.files && Array.isArray(req.files)) {
-      for (const file of req.files) {
-        const fileData: SubmissionFile = {
-          requirementId: file.fieldname,
-          filename: file.filename,
-          originalName: file.originalname,
-          mimetype: file.mimetype,
-          size: file.size,
-          path: file.path,
-          uploadedAt: new Date().toISOString(),
-        };
-        files.push(fileData);
+      const assignment = getAssignmentById(id);
+      if (!assignment) {
+        return res.status(404).json({ error: "Assignment not found" });
       }
+
+      const filesFieldMap = req.files as Record<string, Express.Multer.File[]> | undefined;
+      const submittedFiles: SubmissionFile[] = [];
+
+      if (filesFieldMap) {
+        for (const [fieldName, files] of Object.entries(filesFieldMap)) {
+          const submissionFileType = FIELD_TYPE_MAP[fieldName] ?? "other";
+
+          files.forEach((file) => {
+            submittedFiles.push({
+              id: nanoid(),
+              filename: file.filename,
+              originalName: file.originalname,
+              path: `/api/files/${id}/${file.filename}`,
+              size: file.size,
+              mimeType: file.mimetype,
+              uploadedAt: new Date().toISOString(),
+              type: submissionFileType,
+            });
+          });
+        }
+      }
+
+      const textFields = {
+        problemStatement: req.body.problemStatement ?? "",
+        hmwQuestion: req.body.hmwQuestion ?? "",
+        notes: req.body.notes ?? "",
+      } satisfies Submission["textFields"];
+
+      const submission: Submission = {
+        id: nanoid(),
+        assignmentId: id,
+        userId,
+        submittedAt: new Date().toISOString(),
+        status: "submitted",
+        files: submittedFiles,
+        textFields,
+      };
+
+      saveSubmission(submission);
+      res.json(submission);
+    } catch (error) {
+      console.error("Error saving submission:", error);
+      res.status(500).json({ error: "Failed to save submission" });
     }
+  }
+);
 
-    const now = new Date().toISOString();
+router.get("/:id/progress", (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = (req.query.userId as string) || "default-user";
 
-    const submission: AssignmentSubmission = {
-      id: existingSubmission?.id || nanoid(),
-      assignmentId,
+    const progress = getUserProgress(userId, id);
+    res.json(progress || { userId, assignmentId: id, checklist: {}, lastUpdated: new Date().toISOString() });
+  } catch (error) {
+    console.error("Error fetching progress:", error);
+    res.status(500).json({ error: "Failed to fetch progress" });
+  }
+});
+
+router.post("/:id/progress", express.json(), (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.body.userId || "default-user";
+
+    const progress: UserProgress = {
       userId,
-      status: statusData,
-      submittedAt:
-        statusData === "submitted" ? now : existingSubmission?.submittedAt,
-      fields: fieldsData,
-      files: [...(existingSubmission?.files || []), ...files],
-      score: existingSubmission?.score,
-      feedback: existingSubmission?.feedback,
-      createdAt: existingSubmission?.createdAt || now,
-      updatedAt: now,
+      assignmentId: id,
+      checklist: req.body.checklist || {},
+      lastUpdated: new Date().toISOString(),
     };
 
-    await saveSubmission(submission);
-
-    const response: ApiResponse<AssignmentSubmission> = {
-      success: true,
-      data: submission,
-      message:
-        statusData === "submitted"
-          ? "Assignment submitted successfully"
-          : "Draft saved",
-    };
-    res.json(response);
+    saveUserProgress(progress);
+    res.json(progress);
   } catch (error) {
-    const response: ApiResponse<never> = {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to submit assignment",
-    };
-    res.status(500).json(response);
-  }
-});
-
-// Get submission by ID
-router.get("/submissions/:submissionId", async (req, res) => {
-  try {
-    const { submissionId } = req.params;
-    const submission = await getSubmissionById(submissionId);
-
-    if (!submission) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: "Submission not found",
-      };
-      return res.status(404).json(response);
-    }
-
-    const response: ApiResponse<AssignmentSubmission> = {
-      success: true,
-      data: submission,
-    };
-    res.json(response);
-  } catch (error) {
-    const response: ApiResponse<never> = {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to fetch submission",
-    };
-    res.status(500).json(response);
-  }
-});
-
-// Update submission (for grading)
-router.patch("/submissions/:submissionId", async (req, res) => {
-  try {
-    const { submissionId } = req.params;
-    const submission = await getSubmissionById(submissionId);
-
-    if (!submission) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: "Submission not found",
-      };
-      return res.status(404).json(response);
-    }
-
-    const validationResult = updateSubmissionSchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: validationResult.error.message,
-      };
-      return res.status(400).json(response);
-    }
-
-    const updates = validationResult.data;
-    const updatedSubmission: AssignmentSubmission = {
-      ...submission,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (updates.status === "submitted" && !submission.submittedAt) {
-      updatedSubmission.submittedAt = new Date().toISOString();
-    }
-
-    await saveSubmission(updatedSubmission);
-
-    const response: ApiResponse<AssignmentSubmission> = {
-      success: true,
-      data: updatedSubmission,
-      message: "Submission updated successfully",
-    };
-    res.json(response);
-  } catch (error) {
-    const response: ApiResponse<never> = {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to update submission",
-    };
-    res.status(500).json(response);
+    console.error("Error saving progress:", error);
+    res.status(500).json({ error: "Failed to save progress" });
   }
 });
 

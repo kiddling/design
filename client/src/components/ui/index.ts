@@ -1,3 +1,9 @@
-// Export all UI components from here
-// Components will be added via shadcn CLI
-export { Button, buttonVariants } from "./button";
+export * from "./badge";
+export * from "./button";
+export * from "./card";
+export * from "./checkbox";
+export * from "./dialog";
+export * from "./difficulty-badge";
+export * from "./input";
+export * from "./scroll-area";
+export * from "./sheet";

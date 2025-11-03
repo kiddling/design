@@ -1,7 +1,8 @@
-import express, { type Request, Response } from "express";
+import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import type { HealthResponse } from "@shared/types";
+import { mockCases } from "../shared/mock-data";
+import type { Case, Discipline, Difficulty } from "../shared/types";
 
 // Middleware
 import { requestLogger } from "./middleware/logger";
@@ -21,95 +22,269 @@ import usersRouter from "./routes/users";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function createServer() {
-  const app = express();
+const app = express();
+const PORT =
+  process.env.PORT || (process.env.NODE_ENV === "production" ? 3000 : 3001);
 
-  // Basic middleware
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-  // Logging
-  app.use(requestLogger);
+const favorites = new Set<string>();
 
-  // CORS - allow Vite dev server
-  app.use((req, res, next) => {
-    const origin = req.headers.origin || "*";
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-    );
-    res.header("Access-Control-Allow-Credentials", "true");
+app.get("/api/cases", (req, res) => {
+  try {
+    const {
+      search,
+      disciplines,
+      tags,
+      difficulty,
+      favorites: showFavorites,
+    } = req.query;
 
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
+    let filteredCases = mockCases.map(c => ({
+      ...c,
+      isFavorite: favorites.has(c.id),
+    }));
+
+    if (search) {
+      const searchLower = String(search).toLowerCase();
+      filteredCases = filteredCases.filter(
+        c =>
+          c.title.toLowerCase().includes(searchLower) ||
+          c.keyInsight.toLowerCase().includes(searchLower) ||
+          c.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+          c.problem.toLowerCase().includes(searchLower) ||
+          c.solution.toLowerCase().includes(searchLower)
+      );
     }
-    next();
-  });
 
-  // Health check route
-  app.get("/api/health", (_req: Request, res: Response) => {
-    const response: HealthResponse = {
-      status: "ok",
-      timestamp: new Date().toISOString(),
-    };
-    res.json(response);
-  });
+    if (disciplines) {
+      const disciplineList = String(disciplines).split(",") as Discipline[];
+      filteredCases = filteredCases.filter(c =>
+        disciplineList.includes(c.discipline)
+      );
+    }
 
-  // Apply rate limiter to all API routes
-  app.use("/api", apiLimiter);
+    if (tags) {
+      const tagList = String(tags).split(",");
+      filteredCases = filteredCases.filter(c =>
+        tagList.some(tag => c.tags.includes(tag))
+      );
+    }
 
-  // Content API routes
-  app.use("/api/courses", coursesRouter);
-  app.use("/api/knowledge", knowledgeRouter);
-  app.use("/api/cases", casesRouter);
-  app.use("/api/prompts", promptsRouter);
-  app.use("/api/workflows", workflowsRouter);
-  app.use("/api/resources", resourcesRouter);
-  app.use("/api/assignments", assignmentsRouter);
+    if (difficulty) {
+      const difficultyList = String(difficulty).split(",") as Difficulty[];
+      filteredCases = filteredCases.filter(c =>
+        difficultyList.includes(c.difficulty)
+      );
+    }
 
-  // Apply stricter rate limit to submission routes
-  app.use("/api/assignments/:id/submit", submissionLimiter);
+    if (showFavorites === "true") {
+      filteredCases = filteredCases.filter(c => c.isFavorite);
+    }
 
-  // User state routes
-  app.use("/api/users", usersRouter);
-
-  // Serve uploaded files in development (in production, use nginx or CDN)
-  if (process.env.NODE_ENV !== "production") {
-    app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
+    res.json(filteredCases);
+  } catch (error) {
+    console.error("Error fetching cases:", error);
+    res.status(500).json({ error: "Failed to fetch cases" });
   }
+});
 
-  // Serve static files in production
-  if (process.env.NODE_ENV === "production") {
-    const publicPath = path.resolve(__dirname, "../public");
-    app.use(express.static(publicPath));
+app.post("/api/cases/:id/favorite", (req, res) => {
+  try {
+    const { id } = req.params;
+    const caseItem = mockCases.find(c => c.id === id);
 
-    // Serve index.html for all non-API routes (SPA fallback)
-    app.get("*", (_req: Request, res: Response) => {
-      res.sendFile(path.join(publicPath, "index.html"));
+    if (!caseItem) {
+      return res.status(404).json({ error: "Case not found" });
+    }
+
+    if (favorites.has(id)) {
+      favorites.delete(id);
+    } else {
+      favorites.add(id);
+    }
+
+    res.json({
+      id,
+      isFavorite: favorites.has(id),
+      message: favorites.has(id)
+        ? "Added to favorites"
+        : "Removed from favorites",
     });
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+    res.status(500).json({ error: "Failed to toggle favorite" });
   }
+});
 
-  // 404 handler for API routes
-  app.use("/api/*", notFoundHandler);
+app.get("/api/workflow/steps", (_req, res) => {
+  res.json(workflowSteps);
+});
 
-  // Global error handler
-  app.use(errorHandler);
+app.get("/api/workflow/jan-gehl", (_req, res) => {
+  res.json(janGehlStages);
+});
 
-  return app;
-}
+app.get("/api/workflow/tools", (_req, res) => {
+  res.json(toolRecommendations);
+});
 
-// Start server if not imported as module
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const app = createServer();
-  const port = process.env.PORT || 5000;
+app.get("/api/workflow/templates", (_req, res) => {
+  res.json(downloadableTemplates);
+});
 
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+app.get("/api/workflow/progress", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const progress = workflowProgressStore.get(userId);
+  
+  if (!progress) {
+    const defaultProgress: WorkflowProgress = {
+      userId,
+      completedSteps: [],
+      checklistProgress: {},
+      usedTools: [],
+      downloadedTemplates: [],
+      notes: {},
+      lastUpdated: new Date().toISOString(),
+      overallProgress: 0,
+    };
+    return res.json(defaultProgress);
+  }
+  
+  res.json(progress);
+});
+
+app.post("/api/workflow/progress", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const {
+    completedSteps,
+    checklistProgress,
+    usedTools,
+    downloadedTemplates,
+    notes,
+  } = req.body;
+  
+  const totalSteps = workflowSteps.length;
+  const totalChecklists = workflowSteps.reduce(
+    (sum, step) => sum + step.checklist.length,
+    0
+  );
+  const completedChecklists = Object.values(checklistProgress || {}).reduce(
+    (sum: number, items) => sum + (items as string[]).length,
+    0
+  );
+  
+  const stepProgress = (completedSteps?.length || 0) / totalSteps;
+  const checklistProgressValue = completedChecklists / totalChecklists;
+  const toolProgress = (usedTools?.length || 0) / toolRecommendations.length;
+  
+  const overallProgress = Math.round(
+    (stepProgress * 0.4 + checklistProgressValue * 0.4 + toolProgress * 0.2) * 100
+  );
+  
+  const progress: WorkflowProgress = {
+    userId,
+    completedSteps: completedSteps || [],
+    checklistProgress: checklistProgress || {},
+    usedTools: usedTools || [],
+    downloadedTemplates: downloadedTemplates || [],
+    notes: notes || {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress,
+  };
+  
+  workflowProgressStore.set(userId, progress);
+  res.json(progress);
+});
+
+app.post("/api/workflow/tools/:toolId/use", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { toolId } = req.params;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  if (!progress.usedTools.includes(toolId)) {
+    progress.usedTools.push(toolId);
+    progress.lastUpdated = new Date().toISOString();
+    workflowProgressStore.set(userId, progress);
+  }
+  
+  res.json(progress);
+});
+
+app.post("/api/workflow/templates/:templateId/download", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { templateId } = req.params;
+  
+  const template = getTemplateById(templateId);
+  if (!template) {
+    return res.status(404).json({ error: "Template not found" });
+  }
+  
+  template.downloadCount++;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  if (!progress.downloadedTemplates.includes(templateId)) {
+    progress.downloadedTemplates.push(templateId);
+    progress.lastUpdated = new Date().toISOString();
+    workflowProgressStore.set(userId, progress);
+  }
+  
+  res.json({ template, progress });
+});
+
+app.post("/api/workflow/notes", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { stageId, note } = req.body;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  progress.notes[stageId] = note;
+  progress.lastUpdated = new Date().toISOString();
+  workflowProgressStore.set(userId, progress);
+  
+  res.json(progress);
+});
+
+if (process.env.NODE_ENV === "production") {
+  const publicPath = path.join(__dirname, "public");
+  app.use(express.static(publicPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(publicPath, "index.html"));
   });
 }
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+export default app;
