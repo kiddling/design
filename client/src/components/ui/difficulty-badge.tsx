@@ -1,33 +1,36 @@
 import { Badge } from "./badge";
 import { cn } from "@/lib/utils";
-
-export type DifficultyLevel = "base" | "advance" | "stretch";
+import type { Difficulty } from "@shared/types";
 
 interface DifficultyBadgeProps {
-  level: DifficultyLevel;
+  difficulty: Difficulty;
   className?: string;
 }
 
 const difficultyConfig = {
   base: {
-    label: "基础",
+    label: "基础 Base",
     className:
-      "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
   },
   advance: {
-    label: "进阶",
+    label: "进阶 Advance",
     className:
-      "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+      "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
   },
   stretch: {
-    label: "拓展",
+    label: "挑战 Stretch",
     className:
-      "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+      "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800",
   },
 };
 
-export function DifficultyBadge({ level, className }: DifficultyBadgeProps) {
-  const config = difficultyConfig[level];
+export function DifficultyBadge({
+  difficulty,
+  className,
+}: DifficultyBadgeProps) {
+  const config = difficultyConfig[difficulty];
+
   return (
     <Badge variant="outline" className={cn(config.className, className)}>
       {config.label}

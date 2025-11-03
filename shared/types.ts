@@ -1,37 +1,38 @@
-export type DifficultyLevel = "base" | "advance" | "stretch";
-export type KnowledgeCategory = "theory" | "framework" | "lens" | "method";
+export type Discipline =
+  | "architecture"
+  | "graphic-design"
+  | "product-design"
+  | "urban-planning"
+  | "digital-media";
 
-export interface KnowledgeCard {
+export type Difficulty = "base" | "advance" | "stretch";
+
+export interface Case {
   id: string;
   title: string;
-  titleEn?: string;
-  category: KnowledgeCategory;
-  difficulty: DifficultyLevel;
-  summary: string;
-  coreIdea: string;
-  examples: string[];
-  applicationTips: string[];
-  recommendedReadings: {
-    title: string;
-    author?: string;
-    url?: string;
-  }[];
-  relatedCards: string[];
-  mediaUrl?: string;
+  discipline: Discipline;
   tags: string[];
+  difficulty: Difficulty;
+  imageUrl?: string;
+  keyInsight: string;
+  problem: string;
+  deconstruction: string;
+  solution: string;
+  references: Reference[];
+  relatedKnowledge: string[];
+  isFavorite?: boolean;
 }
 
-export interface UserCardState {
-  cardId: string;
-  isFavorite: boolean;
-  isStudied: boolean;
-  notes?: string;
-  lastAccessedAt?: string;
+export interface Reference {
+  title: string;
+  url: string;
+  type: "article" | "video" | "book" | "website";
 }
 
-export interface CardRelationship {
-  from: string;
-  to: string;
-  type: "prerequisite" | "related" | "application";
-  description?: string;
+export interface CaseFilters {
+  disciplines: Discipline[];
+  tags: string[];
+  difficulty: Difficulty[];
+  search: string;
+  favorites: boolean;
 }
