@@ -174,7 +174,6 @@ export const KnowledgeCardSchema = z.object({
   mediaUrl: z.string().optional(),
   examples: z.array(z.string()).optional(),
   applicationTips: z.array(z.string()).optional(),
-  titleEn: z.string().optional(),
   recommendedReadings: z.array(z.any()).optional(),
 });
 
@@ -445,10 +444,11 @@ export interface UserCardState {
 }
 
 export interface CardRelationship {
-  toId: string;
-  relationType: "prerequisite" | "related" | "extends" | "applies_to" | "part_of" | "references" | "application";
+  id: string;
+  source: string;
+  target: string;
+  type: "prerequisite" | "related";
   description?: string;
-  from?: string;
 }
 
 export interface ApiResponse<T = any> {

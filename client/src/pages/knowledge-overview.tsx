@@ -156,7 +156,8 @@ export function KnowledgeOverview() {
   const relatedCardsList = selectedCard
     ? getRelatedCards(selectedCard.id)
         .map(rel => {
-          const relatedId = rel.from === selectedCard.id ? rel.to : rel.from;
+          const relatedId =
+            rel.source === selectedCard.id ? rel.target : rel.source;
           return cards.find(c => c.id === relatedId);
         })
         .filter((c): c is KnowledgeCard => c !== undefined)
@@ -296,11 +297,6 @@ export function KnowledgeOverview() {
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">
                           {card.title}
                         </CardTitle>
-                        {card.titleEn && (
-                          <CardDescription className="text-xs mt-1">
-                            {card.titleEn}
-                          </CardDescription>
-                        )}
                       </div>
                       <div className="flex gap-1">
                         {userState.isFavorite && (
@@ -356,8 +352,8 @@ export function KnowledgeOverview() {
             cards={filteredAndSortedCards}
             relationships={relationships.filter(
               rel =>
-                filteredAndSortedCards.some(c => c.id === rel.from) &&
-                filteredAndSortedCards.some(c => c.id === rel.to)
+                filteredAndSortedCards.some(c => c.id === rel.source) &&
+                filteredAndSortedCards.some(c => c.id === rel.target)
             )}
             selectedCardId={selectedCardId || undefined}
             onCardSelect={handleCardClick}
