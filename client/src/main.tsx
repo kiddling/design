@@ -1,49 +1,22 @@
-import React, { StrictMode, useEffect } from "react";
-import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import App from "./App";
-import { setupWebVitals } from "./lib/analytics";
-import "./styles.css";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Router, Route, Switch } from "wouter";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      suspense: true,
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60,
-    },
-  },
-});
+import AppLayout from "./pages/AppLayout";
+import AssignmentsPage from "./pages/AssignmentsPage";
+import AssignmentDetailPage from "./pages/AssignmentDetailPage";
+import "./styles/global.css";
 
-function AxeInitializer() {
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      void import("@axe-core/react").then(({ default: axe }) => {
-        axe(React, ReactDOM, 1000);
-      });
-    }
-  }, []);
-
-  return null;
-}
-
-const container = document.getElementById("root");
-
-if (!container) {
-  throw new Error("Root element not found");
-}
-
-const root = ReactDOM.createRoot(container);
-
-setupWebVitals();
-
-root.render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AxeInitializer />
-      <App />
-      {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
-    </QueryClientProvider>
-  </StrictMode>,
+    <Router>
+      <AppLayout>
+        <Switch>
+          <Route path="/" component={AssignmentsPage} />
+          <Route path="/assignments" component={AssignmentsPage} />
+          <Route path="/assignments/:assignmentId" component={AssignmentDetailPage} />
+        </Switch>
+      </AppLayout>
+    </Router>
+  </StrictMode>
 );
