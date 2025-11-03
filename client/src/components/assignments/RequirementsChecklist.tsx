@@ -15,6 +15,7 @@ export default function RequirementsChecklist({ assignmentId, requirements, prog
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const requirementList = Array.isArray(requirements) ? requirements : [];
 
   useEffect(() => {
     const next = progress?.checklist ?? {};
@@ -46,7 +47,10 @@ export default function RequirementsChecklist({ assignmentId, requirements, prog
     }
   }
 
-  const completedCount = requirements.filter((req) => checklist[req.id]).length;
+  const completedCount = requirementList.filter((req) => {
+    const requirementId = String((req as any)?.id ?? "");
+    return requirementId ? checklist[requirementId] : false;
+  }).length;
 
   return (
     <section className="rounded-lg border border-white/10 bg-slate-900/60 p-6">
@@ -54,46 +58,63 @@ export default function RequirementsChecklist({ assignmentId, requirements, prog
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">作业要求清单</h2>
           <span className="rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300">
-            {completedCount} / {requirements.length} 已完成
+            {completedCount} / {requirementList.length} 已完成
           </span>
         </div>
         <p className="text-sm text-slate-400">逐项完成以下要求，确保提交内容完整</p>
       </header>
 
-      <ul className="mt-4 space-y-4">
-        {requirements.map((requirement) => {
-          const isCompleted = checklist[requirement.id];
-          return (
-            <li
-              key={requirement.id}
-              className={cn(
-                "rounded-lg border border-white/5 bg-slate-900/50 p-4 transition hover:border-white/15",
-                isCompleted && "border-green-500/40 bg-green-500/10"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <input
-                  id={`requirement-${requirement.id}`}
-                  type="checkbox"
-                  checked={isCompleted}
-                  onChange={() => handleToggle(requirement.id)}
-                  className="mt-1 h-5 w-5 cursor-pointer rounded border border-white/30 bg-slate-950 text-blue-500 focus:ring-blue-500"
-                />
-                <div className="space-y-1">
-                  <label htmlFor={`requirement-${requirement.id}`} className="text-base font-medium leading-tight text-white">
-                    {requirement.title}
-                    {requirement.required && (
-                      <span className="ml-2 rounded bg-red-500/20 px-2 py-0.5 text-xs text-red-300">必交</span>
+      {requirementList.length === 0 ? (
+        <div className="mt-4 rounded-lg border border-white/5 bg-slate-900/40 p-4 text-sm text-slate-400">
+          当前没有需要完成的作业要求。
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-4">
+          {requirementList.map((requirement, index) => {
+            const requirementId = String((requirement as any)?.id ?? index);
+            const requirementTitle =
+              (requirement as any)?.title ?? (requirement as any)?.label ?? `要求 ${index + 1}`;
+            const requirementDescription = (requirement as any)?.description ?? "";
+            const requirementType = (requirement as any)?.type ?? "file";
+            const isRequired = Boolean((requirement as any)?.required);
+            const isCompleted = checklist[requirementId];
+
+            return (
+              <li
+                key={requirementId}
+                className={cn(
+                  "rounded-lg border border-white/5 bg-slate-900/50 p-4 transition hover:border-white/15",
+                  isCompleted && "border-green-500/40 bg-green-500/10"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <input
+                    id={`requirement-${requirementId}`}
+                    type="checkbox"
+                    checked={isCompleted}
+                    onChange={() => handleToggle(requirementId)}
+                    className="mt-1 h-5 w-5 cursor-pointer rounded border border-white/30 bg-slate-950 text-blue-500 focus:ring-blue-500"
+                  />
+                  <div className="space-y-1">
+                    <label htmlFor={`requirement-${requirementId}`} className="text-base font-medium leading-tight text-white">
+                      {requirementTitle}
+                      {isRequired && (
+                        <span className="ml-2 rounded bg-red-500/20 px-2 py-0.5 text-xs text-red-300">必交</span>
+                      )}
+                    </label>
+                    {requirementDescription && (
+                      <p className="text-sm leading-relaxed text-slate-400">{requirementDescription}</p>
                     )}
-                  </label>
-                  <p className="text-sm leading-relaxed text-slate-400">{requirement.description}</p>
-                  <div className="text-xs uppercase tracking-wide text-slate-500">类型 · {translateRequirementType(requirement.type)}</div>
+                    <div className="text-xs uppercase tracking-wide text-slate-500">
+                      类型 · {translateRequirementType(requirementType as AssignmentRequirement["type"])}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
         <span>{saving ? "正在保存..." : feedback ?? "进度将自动保存"}</span>

@@ -56,10 +56,10 @@ export default function CoursePage() {
     },
   });
   
-  const completedSections = progress?.completedSections || [];
+  const completedSections = Array.isArray(progress?.completedSections) ? (progress?.completedSections as string[]) : [];
   
   useEffect(() => {
-    if (course?.sections.length && !activeSection) {
+    if (Array.isArray(course?.sections) && course.sections.length > 0 && !activeSection) {
       setActiveSection(course.sections[0].id);
     }
   }, [course, activeSection]);
@@ -161,6 +161,11 @@ export default function CoursePage() {
     );
   }
   
+  const sections = Array.isArray(course.sections) ? course.sections : [];
+  const objectiveList = Array.isArray((course as any).objectives) ? (course as any).objectives : [];
+  const metadataTags = Array.isArray(course.metadata?.tags) ? course.metadata.tags : [];
+  const progressValue = typeof progress?.progressPercentage === "number" ? progress.progressPercentage : 0;
+  
   return (
     <div className="min-h-screen bg-background">
       <div className="relative bg-gradient-to-b from-primary/10 via-background to-background">
@@ -199,11 +204,11 @@ export default function CoursePage() {
               <div className="flex flex-wrap gap-4 items-center">
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>{course.duration}</span>
+                  <span>{course.duration ?? "时长待定"}</span>
                 </div>
-                <Badge variant="secondary">{course.metadata.level}</Badge>
-                {course.metadata.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline">
+                <Badge variant="secondary">{course.metadata?.level ?? "未分类"}</Badge>
+                {metadataTags.map((tag, index) => (
+                  <Badge key={`${tag}-${index}`} variant="outline">
                     {tag}
                   </Badge>
                 ))}
@@ -216,25 +221,25 @@ export default function CoursePage() {
                     <span className="font-medium">学习进度</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {completedSections.length} / {course.sections.length} 完成
+                    {completedSections.length} / {sections.length} 完成
                   </span>
                 </div>
                 <Progress
-                  value={progress?.progressPercentage || 0}
+                  value={progressValue}
                   className="h-2"
                 />
               </div>
               
-              {course.objectives.length > 0 && (
+              {objectiveList.length > 0 && (
                 <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6 space-y-4">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                     <h2 className="font-semibold text-lg">学习目标</h2>
                   </div>
                   <ul className="space-y-2">
-                    {course.objectives.map((objective, index) => (
+                    {objectiveList.map((objective, index) => (
                       <li
-                        key={index}
+                        key={`${objective}-${index}`}
                         className="flex items-start gap-3 text-muted-foreground"
                       >
                         <div className="h-1.5 w-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
@@ -253,70 +258,76 @@ export default function CoursePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <aside className="lg:col-span-3">
             <CourseNavigation
-              sections={course.sections}
+              sections={sections}
               activeSection={activeSection}
               onNavigate={handleNavigate}
             />
           </aside>
           
           <main className="lg:col-span-9 space-y-12">
-            {course.sections.map((section, index) => (
-              <motion.section
-                key={section.id}
-                ref={(el) => {
-                  if (el) {
-                    sectionRefs.current.set(section.id, el);
-                  }
-                }}
-                data-section-id={section.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="scroll-mt-24"
-              >
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h2
-                        className="text-2xl font-bold tracking-tight"
-                        id={section.id}
-                      >
-                        {section.title}
-                      </h2>
-                      <Badge variant="outline" className="text-xs">
-                        {section.order}
-                      </Badge>
+            {sections.map((section, index) => {
+              const sectionId = section.id ?? `section-${index}`;
+              const sectionTitle = section.title ?? `章节 ${index + 1}`;
+              const blocks = Array.isArray(section.content?.blocks) ? section.content.blocks : [];
+
+              return (
+                <motion.section
+                  key={sectionId}
+                  ref={(el) => {
+                    if (el) {
+                      sectionRefs.current.set(sectionId, el);
+                    }
+                  }}
+                  data-section-id={sectionId}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="scroll-mt-24"
+                >
+                  <div className="mb-6 flex items-start justify-between gap-4">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <h2
+                          className="text-2xl font-bold tracking-tight"
+                          id={sectionId}
+                        >
+                          {sectionTitle}
+                        </h2>
+                        <Badge variant="outline" className="text-xs">
+                          {section.order ?? index + 1}
+                        </Badge>
+                      </div>
                     </div>
+                    
+                    <label
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors",
+                        completedSections.includes(sectionId)
+                          ? "bg-green-50 dark:bg-green-950"
+                          : "bg-muted"
+                      )}
+                    >
+                      <Checkbox
+                        checked={completedSections.includes(sectionId)}
+                        onCheckedChange={(checked) =>
+                          handleSectionComplete(sectionId, checked as boolean)
+                        }
+                        aria-label={`标记"${sectionTitle}"为${completedSections.includes(sectionId) ? "未完成" : "已完成"}`}
+                      />
+                      <span className="text-xs font-medium whitespace-nowrap">
+                        {completedSections.includes(sectionId)
+                          ? "已完成"
+                          : "标记完成"}
+                      </span>
+                    </label>
                   </div>
                   
-                  <label
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors",
-                      completedSections.includes(section.id)
-                        ? "bg-green-50 dark:bg-green-950"
-                        : "bg-muted"
-                    )}
-                  >
-                    <Checkbox
-                      checked={completedSections.includes(section.id)}
-                      onCheckedChange={(checked) =>
-                        handleSectionComplete(section.id, checked as boolean)
-                      }
-                      aria-label={`标记"${section.title}"为${completedSections.includes(section.id) ? "未完成" : "已完成"}`}
-                    />
-                    <span className="text-xs font-medium whitespace-nowrap">
-                      {completedSections.includes(section.id)
-                        ? "已完成"
-                        : "标记完成"}
-                    </span>
-                  </label>
-                </div>
-                
-                <div className="prose prose-neutral dark:prose-invert max-w-none">
-                  <RichText blocks={section.content.blocks} />
-                </div>
-              </motion.section>
-            ))}
+                  <div className="prose prose-neutral dark:prose-invert max-w-none">
+                    <RichText blocks={blocks} />
+                  </div>
+                </motion.section>
+              );
+            })}
           </main>
         </div>
       </div>
