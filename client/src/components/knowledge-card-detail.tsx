@@ -56,11 +56,6 @@ export function KnowledgeCardDetail({
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <DialogTitle className="text-2xl mb-2">{card.title}</DialogTitle>
-              {card.titleEn && (
-                <DialogDescription className="text-base">
-                  {card.titleEn}
-                </DialogDescription>
-              )}
             </div>
             <div className="flex items-center gap-2">
               <Button
