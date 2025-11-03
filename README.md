@@ -1,166 +1,293 @@
-# 数字设计构成 | Digital Design Composition
+# Digital Design Composition
 
-跨学科设计教育平台 - 探索构成原理在建筑、平面、产品、城市规划和数字媒体领域的应用
+A progressive web application for digital design education, built with React 18, TypeScript, Vite, and Express.
 
 ## Features
 
-- 📚 **案例库 Case Library**: Browse and explore design cases across 5 professional domains
-- 🔍 **智能搜索 Smart Search**: Search cases by title, tags, description with debounced input
-- 🎯 **多维筛选 Multi-dimensional Filters**: Filter by discipline, difficulty level, and tags
-- ❤️ **收藏功能 Favorites**: Save favorite cases for quick access
-- 📱 **响应式设计 Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- 🎨 **深色模式 Dark Mode**: Automatic dark/light theme based on system preferences
-- ⚡ **性能优化 Performance**: Lazy-loaded images, client-side filtering, and React Query caching
-- 🔗 **分享功能 Sharing**: Share and copy case links with URL state management
+- 🎯 **Course Management**: 12-week curriculum with progressive lessons
+- 📚 **Knowledge Cards**: Flashcards for design concepts and theory
+- 📖 **Case Library**: Filterable gallery of design exemplars
+- 🤖 **Prompt Studio**: AI prompt editor for generative design
+- 📝 **Assignments**: Project submission and feedback system
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript, Vite 7
-- **Styling**: Tailwind CSS 4, shadcn/ui components
-- **State Management**: React Query (@tanstack/react-query)
-- **Routing**: Wouter
-- **Backend**: Express.js (Node.js)
-- **UI Components**: Radix UI primitives
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for blazing-fast development
+- **Tailwind CSS 4** for styling
+- **shadcn/ui** component library
+- **Wouter** for lightweight routing
+- **TanStack Query** for data fetching
+- **Framer Motion** for animations
+
+### Backend
+- **Express** server
+- **esbuild** for server bundling
+- TypeScript with ESM
+
+### Testing & Quality
+- **Vitest** for unit/integration tests
+- **Testing Library** for component testing
+- **Supertest** for API testing
+- **Axe** for accessibility auditing (dev only)
+- **Web Vitals** for performance monitoring
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ or npm/pnpm
+- Node.js 18+ 
+- pnpm 8+
 
 ### Installation
 
-```bash
+\`\`\`bash
 # Install dependencies
-npm install --legacy-peer-deps
-```
+pnpm install
+
+# Copy environment file (if needed)
+cp .env.example .env
+\`\`\`
 
 ### Development
 
-Run both the frontend and backend servers:
+\`\`\`bash
+# Start dev server (Vite on port 3000)
+pnpm dev
 
-```bash
-# Terminal 1: Start the backend server (port 3001)
-npm run dev:server
+# Type-check without emitting
+pnpm check
 
-# Terminal 2: Start the frontend dev server (port 3000)
-npm run dev
-```
+# Format code
+pnpm format
+\`\`\`
 
-The application will be available at `http://localhost:3000`
+The dev server includes:
+- Hot module replacement (HMR)
+- Automatic accessibility auditing with axe-core
+- React Query DevTools
 
-### Production Build
+### Testing
 
-```bash
-# Build both frontend and backend
-npm run build
+\`\`\`bash
+# Run all tests
+pnpm test
 
-# Start the production server
-npm start
-```
+# Run tests in watch mode
+pnpm test:watch
 
-### Other Commands
+# Generate coverage report
+pnpm test:coverage
+\`\`\`
 
-```bash
-# Type checking
-npm run check
+**Coverage targets**: ≥80% statements, ≥75% branches, ≥80% functions, ≥80% lines
 
-# Code formatting
-npm run format
-```
+### Building for Production
+
+\`\`\`bash
+# Build client and server
+pnpm build
+
+# Start production server
+pnpm start
+\`\`\`
+
+Build output:
+- Client bundle: \`dist/public/\`
+- Server bundle: \`dist/index.js\`
 
 ## Project Structure
 
-```
+\`\`\`
 .
-├── client/                 # Frontend application
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   │   ├── ui/       # shadcn/ui components
-│   │   │   ├── case-card.tsx
-│   │   │   ├── case-detail-modal.tsx
-│   │   │   └── case-filters.tsx
-│   │   ├── pages/        # Route pages
-│   │   │   └── cases.tsx
-│   │   ├── lib/          # Utilities
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── App.tsx       # Main app component
-│   │   ├── main.tsx      # Entry point
-│   │   └── index.css     # Global styles
-│   └── index.html         # HTML template
-├── server/                # Backend API
-│   └── index.ts          # Express server
-├── shared/               # Shared code between client/server
-│   ├── types.ts         # TypeScript types
-│   └── mock-data.ts     # Mock case data
-└── package.json
+├── client/
+│   ├── index.html
+│   └── src/
+│       ├── components/      # Reusable UI components
+│       ├── pages/           # Route-level components (lazy-loaded)
+│       ├── hooks/           # Custom React hooks
+│       ├── lib/             # Utilities (analytics, utils)
+│       ├── test/            # Test setup files
+│       ├── App.tsx          # Root component with routing
+│       ├── main.tsx         # Entry point
+│       └── styles.css       # Global styles
+├── server/
+│   └── index.ts             # Express server with API routes
+├── shared/
+│   ├── types.ts             # Shared TypeScript types
+│   └── data.ts              # Mock/seed data
+├── tests/
+│   ├── components/          # Component tests
+│   └── server.test.ts       # API tests
+└── ...config files
+\`\`\`
 
-```
+## Performance Optimizations
 
-## Case Library Features
+### Implemented
+- ✅ Route-level code splitting with \`React.lazy\`
+- ✅ Suspense boundaries for async components
+- ✅ Skeleton loaders for perceived performance
+- ✅ Image lazy-loading via \`loading="lazy"\`
+- ✅ Data prefetching on hover/focus (TanStack Query)
+- ✅ Web Vitals monitoring (CLS, FCP, FID, INP, LCP, TTFB)
 
-### Filtering & Search
+### Bundle Analysis
 
-- **Disciplines**: 建筑设计, 平面设计, 产品设计, 城市规划, 数字媒体
-- **Difficulty Levels**: 基础 (Base), 进阶 (Advance), 挑战 (Stretch)
-- **Tags**: Multiple tags per case for fine-grained filtering
-- **Search**: Real-time search with 300ms debounce
+\`\`\`bash
+# Analyze bundle size
+pnpm build --stats
+npx vite-bundle-visualizer
+\`\`\`
 
-### Case Details
+**Target**: Lighthouse score ≥90 on desktop/mobile for key pages
 
-Each case includes:
+## Accessibility
 
-- **核心洞察 Key Insight**: Main design insight
-- **问题描述 Problem Description**: Context and challenge
-- **解构分析 Deconstruction Analysis**: Design analysis using composition principles
-- **解决方案 Solution**: Design solution and approach
-- **参考资料 References**: Links to articles, books, videos, and websites
-- **相关知识卡片 Related Knowledge**: Connected learning topics
+### Standards
+- WCAG 2.1 AA compliance
+- Semantic HTML5 landmarks
+- ARIA roles and labels
+- Keyboard navigation (Tab, Enter, Escape)
+- Skip links for main content
+- Focus indicators (3px solid outline)
 
-### URL State Management
+### Auditing
 
-Filters and search queries are synced to the URL, allowing:
+\`\`\`bash
+# Dev mode automatically runs axe-core
+pnpm dev
 
-- Shareable links with specific filters applied
-- Direct links to individual cases
-- Browser back/forward navigation
+# Manual audit (requires Lighthouse CLI)
+npm i -g @lhci/cli
+lhci autorun
+\`\`\`
 
-## API Endpoints
+**Critical issues**: Must be resolved before production
 
-### GET `/api/cases`
+## Testing Strategy
 
-Query parameters:
+### Component Tests
+- Skeleton loaders (rendering, accessibility)
+- Navigation (routing, active states)
+- Error boundaries (error handling)
 
-- `search`: Search query string
-- `disciplines`: Comma-separated discipline IDs
-- `tags`: Comma-separated tags
-- `difficulty`: Comma-separated difficulty levels
-- `favorites`: "true" to show only favorited cases
+### Integration Tests
+- Course detail flow (data fetching, display)
+- Prompt editor interactions
+- Assignment form validation
 
-### POST `/api/cases/:id/favorite`
+### API Tests (Supertest)
+- Course outline endpoint
+- Course detail endpoint
+- Analytics endpoints
 
-Toggle favorite status for a case.
+### E2E Tests (Future)
+- Playwright for smoke tests
+- Responsive breakpoints (mobile, tablet, desktop)
 
-## Design System
+## Scripts Reference
 
-### Colors
+| Script | Description |
+|--------|-------------|
+| \`pnpm dev\` | Start Vite dev server |
+| \`pnpm build\` | Build client + server for production |
+| \`pnpm start\` | Run production server |
+| \`pnpm preview\` | Preview production build locally |
+| \`pnpm check\` | Type-check all TypeScript files |
+| \`pnpm format\` | Format code with Prettier |
+| \`pnpm test\` | Run all tests |
+| \`pnpm test:watch\` | Run tests in watch mode |
+| \`pnpm test:coverage\` | Generate coverage report |
 
-- **Primary**: Deep Blue (#1E40AF) - Professionalism and academia
-- **Secondary**: Orange (#F59E0B) - Creativity and vitality
-- **Accent**: Responsive accent colors for light/dark modes
+## Environment Variables
 
-### Typography
+\`\`\`bash
+# .env
+PORT=3001                      # Server port
+NODE_ENV=development           # Environment (development|production|test)
+VITE_API_BASE_URL=/api         # API base URL for client
+\`\`\`
 
-- **Headings**: Noto Sans SC (思源黑体) - Modern, clear
-- **Body**: Inter + Noto Sans SC - Excellent readability
+## Known Limitations
 
-### Components
+1. **Authentication**: No user login/session management yet
+2. **Database**: Mock data only; no persistence layer
+3. **File Uploads**: Assignment submissions are URL-based
+4. **Internationalization**: Chinese/English content mixed; no i18n framework
+5. **Analytics**: Web Vitals logged but not aggregated/visualized
+6. **Offline Support**: No service worker or PWA manifest
 
-- Fully accessible with ARIA labels
-- Keyboard navigation support
-- Focus visible states
-- Screen reader friendly
+## CI/CD
+
+### GitHub Actions Workflow
+
+Create \`.github/workflows/ci.yml\`:
+
+\`\`\`yaml
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test:coverage
+      - run: pnpm build
+\`\`\`
+
+### Pre-commit Hooks (Optional)
+
+\`\`\`bash
+# Install husky
+pnpm add -D husky lint-staged
+
+# Initialize
+npx husky init
+
+# Add pre-commit hook
+echo "pnpm check && pnpm format" > .husky/pre-commit
+\`\`\`
+
+## Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (\`git checkout -b feature/amazing-feature\`)
+3. **Commit** your changes (\`git commit -m 'Add amazing feature'\`)
+4. **Push** to the branch (\`git push origin feature/amazing-feature\`)
+5. **Open** a Pull Request
+
+### Code Style
+- Use **TypeScript** for all new files
+- Follow **Prettier** formatting (auto-format on commit)
+- Write **tests** for new features (≥80% coverage)
+- Add **accessibility** attributes (ARIA, semantic HTML)
 
 ## License
 
 MIT
+
+## Support
+
+For questions or issues, please open a GitHub issue or contact the development team.
+
+---
+
+**Last Updated**: 2024-11  
+**Version**: 1.0.0
