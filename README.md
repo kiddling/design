@@ -50,6 +50,8 @@ pnpm install
 cp .env.example .env
 \`\`\`
 
+**Note**: The project includes a \`.npmrc\` file that disables strict peer dependency checking (\`strict-peer-dependencies=false\`) to handle Vite 7 peer dependency conflicts with development plugins.
+
 ### Development
 
 \`\`\`bash
@@ -87,6 +89,7 @@ pnpm test:coverage
 
 \`\`\`bash
 # Build client and server
+pnpm install
 pnpm build
 
 # Start production server
@@ -94,8 +97,10 @@ pnpm start
 \`\`\`
 
 Build output:
-- Client bundle: \`dist/public/\`
+- Client bundle: \`dist/client/\`
 - Server bundle: \`dist/index.js\`
+
+**Important**: This project uses pnpm with \`.npmrc\` configuration (\`strict-peer-dependencies=false\`) to handle peer dependency conflicts between Vite 7 and some development plugins (@builder.io/vite-plugin-jsx-loc).
 
 ## Project Structure
 
@@ -219,6 +224,55 @@ VITE_API_BASE_URL=/api         # API base URL for client
 5. **Analytics**: Web Vitals logged but not aggregated/visualized
 6. **Offline Support**: No service worker or PWA manifest
 
+## Deployment
+
+### Vercel Deployment
+
+This project is configured for deployment on Vercel with the following setup:
+
+1. **Automatic Configuration**: The project includes a \`vercel.json\` file that configures:
+   - Package manager: pnpm (specified in \`package.json\`)
+   - Build command: \`pnpm install && pnpm build\`
+   - Output directory: \`dist/client\`
+   - Peer dependency handling: via \`.npmrc\` with \`strict-peer-dependencies=false\`
+
+2. **Deploy Steps**:
+   \`\`\`bash
+   # Install Vercel CLI (if not already installed)
+   npm i -g vercel
+   
+   # Deploy to Vercel
+   vercel
+   
+   # Deploy to production
+   vercel --prod
+   \`\`\`
+
+3. **Environment Variables**: Set these in Vercel dashboard (if needed):
+   - \`NODE_ENV=production\`
+   - \`PORT\` (handled automatically by Vercel)
+
+### Troubleshooting Deployment
+
+**Peer Dependency Errors**:
+If you encounter peer dependency conflicts during deployment:
+- Ensure \`.npmrc\` file exists with \`strict-peer-dependencies=false\`
+- Verify \`vercel.json\` uses \`pnpm install\`
+- The project requires pnpm (specified in \`package.json\` \`packageManager\` field)
+- The \`.npmrc\` file is automatically used by pnpm to handle Vite 7 peer dependency conflicts
+
+**Build Failures**:
+1. Check build logs for TypeScript errors: \`pnpm check\`
+2. Verify all environment variables are set in Vercel dashboard
+3. Ensure \`dist/client\` directory is generated after build
+4. Test build locally: \`pnpm install && pnpm build\`
+
+**Redeploy After Fix**:
+\`\`\`bash
+# Redeploy after configuration changes
+vercel --prod --force
+\`\`\`
+
 ## CI/CD
 
 ### GitHub Actions Workflow
@@ -246,7 +300,7 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm check
       - run: pnpm test:coverage
       - run: pnpm build

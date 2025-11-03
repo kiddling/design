@@ -6,10 +6,13 @@ import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const plugins = [
   react(),
   tailwindcss(),
-  jsxLocPlugin(),
+  // Only load jsxLocPlugin in development to avoid peer dependency issues in production
+  ...(isDev ? [jsxLocPlugin()] : []),
   vitePluginManusRuntime(),
 ];
 
@@ -27,7 +30,7 @@ export default defineConfig({
   envDir: path.resolve(import.meta.dirname),
   root: path.resolve(import.meta.dirname, "client"),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist/client"),
     emptyOutDir: true,
   },
   server: {
