@@ -1,72 +1,275 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import type { HealthResponse } from "@shared/types";
+import { mockCases } from "../shared/mock-data";
+import type { Case, Discipline, Difficulty } from "../shared/types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function createServer() {
-  const app = express();
+const app = express();
+const PORT =
+  process.env.PORT || (process.env.NODE_ENV === "production" ? 3000 : 3001);
 
-  // Middleware
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-  // CORS
-  app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
+const favorites = new Set<string>();
+
+app.get("/api/cases", (req, res) => {
+  try {
+    const {
+      search,
+      disciplines,
+      tags,
+      difficulty,
+      favorites: showFavorites,
+    } = req.query;
+
+    let filteredCases = mockCases.map(c => ({
+      ...c,
+      isFavorite: favorites.has(c.id),
+    }));
+
+    if (search) {
+      const searchLower = String(search).toLowerCase();
+      filteredCases = filteredCases.filter(
+        c =>
+          c.title.toLowerCase().includes(searchLower) ||
+          c.keyInsight.toLowerCase().includes(searchLower) ||
+          c.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+          c.problem.toLowerCase().includes(searchLower) ||
+          c.solution.toLowerCase().includes(searchLower)
+      );
     }
-    next();
-  });
 
-  // Health check route
-  app.get("/api/health", (_req: Request, res: Response) => {
-    const response: HealthResponse = {
-      status: "ok",
-      timestamp: new Date().toISOString(),
-    };
-    res.json(response);
-  });
+    if (disciplines) {
+      const disciplineList = String(disciplines).split(",") as Discipline[];
+      filteredCases = filteredCases.filter(c =>
+        disciplineList.includes(c.discipline)
+      );
+    }
 
-  // API routes will go here
-  app.get("/api/*", (_req: Request, res: Response) => {
-    res.status(404).json({ error: "API endpoint not found" });
-  });
+    if (tags) {
+      const tagList = String(tags).split(",");
+      filteredCases = filteredCases.filter(c =>
+        tagList.some(tag => c.tags.includes(tag))
+      );
+    }
 
-  // Serve static files in production
-  if (process.env.NODE_ENV === "production") {
-    const publicPath = path.resolve(__dirname, "../public");
-    app.use(express.static(publicPath));
+    if (difficulty) {
+      const difficultyList = String(difficulty).split(",") as Difficulty[];
+      filteredCases = filteredCases.filter(c =>
+        difficultyList.includes(c.difficulty)
+      );
+    }
 
-    // Serve index.html for all non-API routes (SPA fallback)
-    app.get("*", (_req: Request, res: Response) => {
-      res.sendFile(path.join(publicPath, "index.html"));
-    });
+    if (showFavorites === "true") {
+      filteredCases = filteredCases.filter(c => c.isFavorite);
+    }
+
+    res.json(filteredCases);
+  } catch (error) {
+    console.error("Error fetching cases:", error);
+    res.status(500).json({ error: "Failed to fetch cases" });
   }
+});
 
-  // Error handler
-  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error("Server error:", err);
-    res.status(500).json({ error: "Internal server error" });
+app.post("/api/cases/:id/favorite", (req, res) => {
+  try {
+    const { id } = req.params;
+    const caseItem = mockCases.find(c => c.id === id);
+
+    if (!caseItem) {
+      return res.status(404).json({ error: "Case not found" });
+    }
+
+    if (favorites.has(id)) {
+      favorites.delete(id);
+    } else {
+      favorites.add(id);
+    }
+
+    res.json({
+      id,
+      isFavorite: favorites.has(id),
+      message: favorites.has(id)
+        ? "Added to favorites"
+        : "Removed from favorites",
+    });
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+    res.status(500).json({ error: "Failed to toggle favorite" });
+  }
+});
+
+app.get("/api/workflow/steps", (_req, res) => {
+  res.json(workflowSteps);
+});
+
+app.get("/api/workflow/jan-gehl", (_req, res) => {
+  res.json(janGehlStages);
+});
+
+app.get("/api/workflow/tools", (_req, res) => {
+  res.json(toolRecommendations);
+});
+
+app.get("/api/workflow/templates", (_req, res) => {
+  res.json(downloadableTemplates);
+});
+
+app.get("/api/workflow/progress", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const progress = workflowProgressStore.get(userId);
+  
+  if (!progress) {
+    const defaultProgress: WorkflowProgress = {
+      userId,
+      completedSteps: [],
+      checklistProgress: {},
+      usedTools: [],
+      downloadedTemplates: [],
+      notes: {},
+      lastUpdated: new Date().toISOString(),
+      overallProgress: 0,
+    };
+    return res.json(defaultProgress);
+  }
+  
+  res.json(progress);
+});
+
+app.post("/api/workflow/progress", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const {
+    completedSteps,
+    checklistProgress,
+    usedTools,
+    downloadedTemplates,
+    notes,
+  } = req.body;
+  
+  const totalSteps = workflowSteps.length;
+  const totalChecklists = workflowSteps.reduce(
+    (sum, step) => sum + step.checklist.length,
+    0
+  );
+  const completedChecklists = Object.values(checklistProgress || {}).reduce(
+    (sum: number, items) => sum + (items as string[]).length,
+    0
+  );
+  
+  const stepProgress = (completedSteps?.length || 0) / totalSteps;
+  const checklistProgressValue = completedChecklists / totalChecklists;
+  const toolProgress = (usedTools?.length || 0) / toolRecommendations.length;
+  
+  const overallProgress = Math.round(
+    (stepProgress * 0.4 + checklistProgressValue * 0.4 + toolProgress * 0.2) * 100
+  );
+  
+  const progress: WorkflowProgress = {
+    userId,
+    completedSteps: completedSteps || [],
+    checklistProgress: checklistProgress || {},
+    usedTools: usedTools || [],
+    downloadedTemplates: downloadedTemplates || [],
+    notes: notes || {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress,
+  };
+  
+  workflowProgressStore.set(userId, progress);
+  res.json(progress);
+});
+
+app.post("/api/workflow/tools/:toolId/use", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { toolId } = req.params;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  if (!progress.usedTools.includes(toolId)) {
+    progress.usedTools.push(toolId);
+    progress.lastUpdated = new Date().toISOString();
+    workflowProgressStore.set(userId, progress);
+  }
+  
+  res.json(progress);
+});
+
+app.post("/api/workflow/templates/:templateId/download", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { templateId } = req.params;
+  
+  const template = getTemplateById(templateId);
+  if (!template) {
+    return res.status(404).json({ error: "Template not found" });
+  }
+  
+  template.downloadCount++;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  if (!progress.downloadedTemplates.includes(templateId)) {
+    progress.downloadedTemplates.push(templateId);
+    progress.lastUpdated = new Date().toISOString();
+    workflowProgressStore.set(userId, progress);
+  }
+  
+  res.json({ template, progress });
+});
+
+app.post("/api/workflow/notes", (req, res) => {
+  const userId = req.headers["x-user-id"] as string || "default-user";
+  const { stageId, note } = req.body;
+  
+  const progress = workflowProgressStore.get(userId) || {
+    userId,
+    completedSteps: [],
+    checklistProgress: {},
+    usedTools: [],
+    downloadedTemplates: [],
+    notes: {},
+    lastUpdated: new Date().toISOString(),
+    overallProgress: 0,
+  };
+  
+  progress.notes[stageId] = note;
+  progress.lastUpdated = new Date().toISOString();
+  workflowProgressStore.set(userId, progress);
+  
+  res.json(progress);
+});
+
+if (process.env.NODE_ENV === "production") {
+  const publicPath = path.join(__dirname, "public");
+  app.use(express.static(publicPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(publicPath, "index.html"));
   });
-
-  return app;
 }
 
-// Start server if not imported as module
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const app = createServer();
-  const port = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
+export default app;

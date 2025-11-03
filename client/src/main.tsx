@@ -1,22 +1,22 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import App from "./App";
-import "./index.css";
+import { Router, Route, Switch } from "wouter";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import AppLayout from "./pages/AppLayout";
+import AssignmentsPage from "./pages/AssignmentsPage";
+import AssignmentDetailPage from "./pages/AssignmentDetailPage";
+import "./styles/global.css";
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <Router>
+      <AppLayout>
+        <Switch>
+          <Route path="/" component={AssignmentsPage} />
+          <Route path="/assignments" component={AssignmentsPage} />
+          <Route path="/assignments/:assignmentId" component={AssignmentDetailPage} />
+        </Switch>
+      </AppLayout>
+    </Router>
   </StrictMode>
 );

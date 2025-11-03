@@ -1,85 +1,40 @@
-import { Route, Switch, Link } from "wouter";
-import HomePage from "./pages/home";
-import CourseDetailPage from "./pages/course-detail";
-import KnowledgePage from "./pages/knowledge";
-import CasesPage from "./pages/cases";
-import AIToolsPage from "./pages/ai-tools";
-import WorkflowPage from "./pages/workflow";
-import ResourcesPage from "./pages/resources";
-import AssignmentsPage from "./pages/assignments";
+import { Route, Switch } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
+import CoursePage from "@/routes/courses/[id]";
+import HomePage from "@/routes/home";
+import WorkflowPage from "@/routes/workflow";
 
-function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <nav className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-8">
-            <Link href="/">
-              <a className="text-xl font-bold text-primary">数字设计构成</a>
-            </Link>
-            <div className="flex gap-4">
-              <Link href="/knowledge">
-                <a className="text-sm hover:text-primary transition-colors">
-                  知识卡片
-                </a>
-              </Link>
-              <Link href="/cases">
-                <a className="text-sm hover:text-primary transition-colors">
-                  案例库
-                </a>
-              </Link>
-              <Link href="/ai-tools">
-                <a className="text-sm hover:text-primary transition-colors">
-                  AI工具箱
-                </a>
-              </Link>
-              <Link href="/workflow">
-                <a className="text-sm hover:text-primary transition-colors">
-                  工作流
-                </a>
-              </Link>
-              <Link href="/resources">
-                <a className="text-sm hover:text-primary transition-colors">
-                  学习资源
-                </a>
-              </Link>
-              <Link href="/assignments">
-                <a className="text-sm hover:text-primary transition-colors">
-                  作业
-                </a>
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
-      <main className="flex-1">{children}</main>
-      <footer className="border-t py-6 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © 2024 数字设计构成 Digital Design Composition
-        </div>
-      </footer>
-    </div>
-  );
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
-export default function App() {
+function App() {
   return (
-    <AppShell>
+    <QueryClientProvider client={queryClient}>
       <Switch>
         <Route path="/" component={HomePage} />
-        <Route path="/courses/:id" component={CourseDetailPage} />
-        <Route path="/knowledge" component={KnowledgePage} />
-        <Route path="/cases" component={CasesPage} />
-        <Route path="/ai-tools" component={AIToolsPage} />
+        <Route path="/courses/:id" component={CoursePage} />
         <Route path="/workflow" component={WorkflowPage} />
-        <Route path="/resources" component={ResourcesPage} />
-        <Route path="/assignments" component={AssignmentsPage} />
         <Route>
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold">404 - 页面未找到</h1>
-          </div>
+          {() => (
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold mb-4">404</h1>
+                <p className="text-muted-foreground">页面未找到</p>
+              </div>
+            </div>
+          )}
         </Route>
       </Switch>
-    </AppShell>
+      <Toaster />
+    </QueryClientProvider>
   );
 }
+
+export default App;

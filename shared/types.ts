@@ -1,16 +1,38 @@
-// Shared types between client and server
+export type Discipline =
+  | "architecture"
+  | "graphic-design"
+  | "product-design"
+  | "urban-planning"
+  | "digital-media";
 
-export interface HealthResponse {
-  status: string;
-  timestamp: string;
-}
+export type Difficulty = "base" | "advance" | "stretch";
 
-export type DifficultyLevel = "base" | "advance" | "stretch";
-
-export interface Course {
+export interface Case {
   id: string;
   title: string;
-  description: string;
-  loop: number;
-  session: number;
+  discipline: Discipline;
+  tags: string[];
+  difficulty: Difficulty;
+  imageUrl?: string;
+  keyInsight: string;
+  problem: string;
+  deconstruction: string;
+  solution: string;
+  references: Reference[];
+  relatedKnowledge: string[];
+  isFavorite?: boolean;
+}
+
+export interface Reference {
+  title: string;
+  url: string;
+  type: "article" | "video" | "book" | "website";
+}
+
+export interface CaseFilters {
+  disciplines: Discipline[];
+  tags: string[];
+  difficulty: Difficulty[];
+  search: string;
+  favorites: boolean;
 }
