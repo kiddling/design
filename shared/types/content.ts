@@ -64,6 +64,57 @@ export const PromptTemplateSchema = z.object({
 
 export type PromptTemplate = z.infer<typeof PromptTemplateSchema>;
 
+export const PromptSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  category: z.string(),
+  tags: z.array(z.string()),
+  difficulty: DifficultyLevelSchema,
+  template: z.string(),
+  variables: z.array(z.object({
+    name: z.string(),
+    description: z.string(),
+    placeholder: z.string(),
+    required: z.boolean(),
+  })),
+  examples: z.array(z.object({
+    title: z.string(),
+    input: z.record(z.string(), z.string()),
+    output: z.string(),
+  })),
+  tips: z.array(z.string()),
+  relatedCourses: z.array(z.string()).optional(),
+  relatedKnowledge: z.array(z.string()).optional(),
+  courseSection: z.string().optional(),
+});
+
+export type Prompt = z.infer<typeof PromptSchema>;
+
+export const WorkflowSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  category: z.string(),
+  tags: z.array(z.string()),
+  difficulty: DifficultyLevelSchema,
+  duration: z.string(),
+  tools: z.array(z.string()),
+  steps: z.array(z.object({
+    id: z.string(),
+    order: z.number(),
+    title: z.string(),
+    description: z.string(),
+    details: z.string().optional(),
+    tips: z.array(z.string()).optional(),
+    tools: z.array(z.string()).optional(),
+  })),
+  relatedCourses: z.array(z.string()).optional(),
+  relatedPrompts: z.array(z.string()).optional(),
+});
+
+export type Workflow = z.infer<typeof WorkflowSchema>;
+
 export const KnowledgeCardPreviewSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -100,6 +151,20 @@ export const KnowledgeCardDetailSchema = KnowledgeCardPreviewSchema.extend({
 
 export type KnowledgeCardDetail = z.infer<typeof KnowledgeCardDetailSchema>;
 
+export const KnowledgeCardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  subtitle: z.string().optional(),
+  description: z.string(),
+  category: z.string(),
+  difficulty: DifficultyLevelSchema,
+  tags: z.array(z.string()),
+  relatedCourses: z.array(z.string()).optional(),
+  relatedCases: z.array(z.string()).optional(),
+});
+
+export type KnowledgeCard = z.infer<typeof KnowledgeCardSchema>;
+
 export const CaseStudySchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -120,6 +185,22 @@ export const CaseStudySchema = z.object({
 });
 
 export type CaseStudy = z.infer<typeof CaseStudySchema>;
+
+export const CaseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  category: z.string(),
+  tags: z.array(z.string()),
+  difficulty: DifficultyLevelSchema,
+  author: z.string().optional(),
+  year: z.string().optional(),
+  relatedCourses: z.array(z.string()).optional(),
+  relatedKnowledge: z.array(z.string()).optional(),
+  relatedPrompts: z.array(z.string()).optional(),
+});
+
+export type Case = z.infer<typeof CaseSchema>;
 
 export const BookSchema = z.object({
   id: z.string(),
@@ -170,26 +251,31 @@ export type RubricCriterion = z.infer<typeof RubricCriterionSchema>;
 
 export const AssignmentSchema = z.object({
   id: z.string(),
-  lessonId: z.string(),
   title: z.string(),
   description: z.string(),
-  objectives: z.array(z.string()),
-  requirements: z.array(z.string()),
-  deliverables: z.array(z.string()),
-  rubric: z.array(RubricCriterionSchema),
-  checklist: z
-    .array(
-      z.object({
-        item: z.string(),
-        required: z.boolean(),
-      })
-    )
-    .optional(),
-  estimatedTime: z.string(),
+  courseId: z.string(),
   difficulty: DifficultyLevelSchema,
-  resources: z.array(z.string()).optional(),
-  examples: z.array(z.string()).optional(),
-  tips: z.array(z.string()).optional(),
+  type: z.string(),
+  requirements: z.array(z.object({
+    id: z.string(),
+    type: z.string(),
+    label: z.string(),
+    description: z.string(),
+    required: z.boolean(),
+  })),
+  rubric: z.object({
+    criteria: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string(),
+      points: z.number(),
+    })),
+    totalPoints: z.number(),
+  }),
+  maxScore: z.number(),
+  relatedKnowledge: z.array(z.string()).optional(),
+  relatedCases: z.array(z.string()).optional(),
+  relatedPrompts: z.array(z.string()).optional(),
 });
 
 export type Assignment = z.infer<typeof AssignmentSchema>;
