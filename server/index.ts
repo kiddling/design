@@ -4,6 +4,21 @@ import { fileURLToPath } from "url";
 import { mockCases } from "../shared/mock-data";
 import type { Case, Discipline, Difficulty } from "../shared/types";
 
+// Middleware
+import { requestLogger } from "./middleware/logger";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { apiLimiter, submissionLimiter } from "./middleware/rateLimiter";
+
+// Routers
+import coursesRouter from "./routes/courses";
+import knowledgeRouter from "./routes/knowledge";
+import casesRouter from "./routes/cases";
+import promptsRouter from "./routes/prompts";
+import workflowsRouter from "./routes/workflows";
+import resourcesRouter from "./routes/resources";
+import assignmentsRouter from "./routes/assignments";
+import usersRouter from "./routes/users";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
