@@ -2,8 +2,9 @@ import { Badge } from "./badge";
 import { cn } from "@/lib/utils";
 import type { Difficulty } from "@shared/types";
 
-interface DifficultyBadgeProps {
-  difficulty: Difficulty;
+export interface DifficultyBadgeProps {
+  difficulty?: Difficulty;
+  level?: Difficulty;
   className?: string;
 }
 
@@ -27,9 +28,11 @@ const difficultyConfig = {
 
 export function DifficultyBadge({
   difficulty,
+  level,
   className,
 }: DifficultyBadgeProps) {
-  const config = difficultyConfig[difficulty];
+  const diffValue = difficulty || level || "base";
+  const config = difficultyConfig[diffValue];
 
   return (
     <Badge variant="outline" className={cn(config.className, className)}>

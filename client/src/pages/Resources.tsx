@@ -65,7 +65,7 @@ export function Resources() {
   }, []);
 
   const allAuthors = useMemo(() => {
-    return Array.from(new Set(resources.map(r => r.author))).sort();
+    return Array.from(new Set(resources.map(r => r.author).filter((a): a is string => !!a))).sort();
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -74,8 +74,8 @@ export function Resources() {
       const matchesSearch =
         !searchTerm ||
         resource.title.toLowerCase().includes(searchLower) ||
-        resource.author.toLowerCase().includes(searchLower) ||
-        resource.summary.toLowerCase().includes(searchLower) ||
+        resource.author?.toLowerCase().includes(searchLower) ||
+        resource.summary?.toLowerCase().includes(searchLower) ||
         resource.tags.some(tag => tag.toLowerCase().includes(searchLower));
 
       const matchesTags =
@@ -84,7 +84,7 @@ export function Resources() {
 
       const matchesAuthors =
         selectedAuthors.length === 0 ||
-        selectedAuthors.includes(resource.author);
+        (resource.author && selectedAuthors.includes(resource.author));
 
       const matchesStates =
         selectedStates.length === 0 ||
@@ -101,9 +101,9 @@ export function Resources() {
   ]);
 
   const groupedResources = useMemo(() => {
-    const classics = filteredResources.filter(r => r.section === "必读经典");
+    const classics = filteredResources.filter(r => r.section === "必读经典" || (r as any).category === "classic");
     const contemporary = filteredResources.filter(
-      r => r.section === "当代视角"
+      r => r.section === "当代视角" || (r as any).category === "contemporary"
     );
     return { classics, contemporary };
   }, [filteredResources]);

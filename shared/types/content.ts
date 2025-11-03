@@ -60,6 +60,14 @@ export const PromptTemplateSchema = z.object({
   tags: z.array(z.string()),
   relatedSections: z.array(z.string()).optional(),
   tips: z.array(z.string()).optional(),
+  role: z.string().optional(),
+  task: z.string().optional(),
+  methodology: z.string().optional(),
+  expectedOutput: z.string().optional(),
+  tier: z.string().optional(),
+  category: z.string().optional(),
+  prompt: z.string().optional(),
+  label: z.string().optional(),
 });
 
 export type PromptTemplate = z.infer<typeof PromptTemplateSchema>;
@@ -161,6 +169,13 @@ export const KnowledgeCardSchema = z.object({
   tags: z.array(z.string()),
   relatedCourses: z.array(z.string()).optional(),
   relatedCases: z.array(z.string()).optional(),
+  summary: z.string().optional(),
+  coreIdea: z.string().optional(),
+  mediaUrl: z.string().optional(),
+  examples: z.array(z.string()).optional(),
+  applicationTips: z.array(z.string()).optional(),
+  titleEn: z.string().optional(),
+  recommendedReadings: z.array(z.any()).optional(),
 });
 
 export type KnowledgeCard = z.infer<typeof KnowledgeCardSchema>;
@@ -182,6 +197,14 @@ export const CaseStudySchema = z.object({
   year: z.string().optional(),
   relatedCases: z.array(z.string()).optional(),
   relatedCards: z.array(z.string()).optional(),
+  thumbnail: z.string().optional(),
+  imageUrl: z.string().optional(),
+  keyInsight: z.string().optional(),
+  problem: z.string().optional(),
+  deconstruction: z.string().optional(),
+  solution: z.string().optional(),
+  references: z.array(z.string()).optional(),
+  isFavorite: z.boolean().optional(),
 });
 
 export type CaseStudy = z.infer<typeof CaseStudySchema>;
@@ -198,6 +221,7 @@ export const CaseSchema = z.object({
   relatedCourses: z.array(z.string()).optional(),
   relatedKnowledge: z.array(z.string()).optional(),
   relatedPrompts: z.array(z.string()).optional(),
+  isFavorite: z.boolean().optional(),
 });
 
 export type Case = z.infer<typeof CaseSchema>;
@@ -228,6 +252,12 @@ export const ResourceItemSchema = z.object({
   isPremium: z.boolean().optional(),
   language: z.enum(["zh", "en", "both"]).optional(),
   difficulty: DifficultyLevelSchema.optional(),
+  author: z.string().optional(),
+  year: z.number().optional(),
+  summary: z.string().optional(),
+  recommendationReason: z.string().optional(),
+  section: z.string().optional(),
+  category: z.string().optional(),
 });
 
 export type ResourceItem = z.infer<typeof ResourceItemSchema>;
@@ -262,6 +292,7 @@ export const AssignmentSchema = z.object({
     label: z.string(),
     description: z.string(),
     required: z.boolean(),
+    title: z.string().optional(),
   })),
   rubric: z.object({
     criteria: z.array(z.object({
@@ -276,6 +307,10 @@ export const AssignmentSchema = z.object({
   relatedKnowledge: z.array(z.string()).optional(),
   relatedCases: z.array(z.string()).optional(),
   relatedPrompts: z.array(z.string()).optional(),
+  code: z.string().optional(),
+  dueDate: z.string().optional(),
+  status: z.string().optional(),
+  lessonId: z.string().optional(),
 });
 
 export type Assignment = z.infer<typeof AssignmentSchema>;
@@ -304,6 +339,9 @@ export const SubmissionSchema = z.object({
       suggestions: z.array(z.string()).optional(),
     })
     .optional(),
+  textFields: z.record(z.string(), z.string()).optional(),
+  score: z.number().optional(),
+  feedback: z.string().optional(),
 });
 
 export type Submission = z.infer<typeof SubmissionSchema>;
@@ -374,6 +412,149 @@ export const UserProgressSchema = z.object({
       })
     )
     .optional(),
+  courseId: z.string().optional(),
+  completedSections: z.array(z.string()).optional(),
+  currentSection: z.string().optional(),
+  progressPercentage: z.number().optional(),
+  checklist: z.array(z.any()).optional(),
+  assignmentId: z.string().optional(),
 });
 
 export type UserProgress = z.infer<typeof UserProgressSchema>;
+
+// Additional types
+export type Difficulty = "base" | "advance" | "stretch";
+export type PromptTier = "base" | "advance" | "stretch";
+
+export interface CustomPrompt {
+  id: string;
+  title: string;
+  description: string;
+  template: string;
+  tier?: PromptTier;
+  category?: string;
+  tags?: string[];
+  content?: string;
+  updatedAt?: string;
+}
+
+export interface UserCardState {
+  isFavorite: boolean;
+  isStudied: boolean;
+  notes?: string;
+}
+
+export interface CardRelationship {
+  toId: string;
+  relationType: "prerequisite" | "related" | "extends" | "applies_to" | "part_of" | "references" | "application";
+  description?: string;
+  from?: string;
+}
+
+export interface ApiResponse<T = any> {
+  data?: T;
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface PaginatedResponse<T = any> {
+  data: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface UserFavorite {
+  id: string;
+  userId: string;
+  itemId: string;
+  itemType: "case" | "knowledge" | "prompt" | "workflow";
+  createdAt: string;
+}
+
+export interface UserHistoryItem {
+  id: string;
+  userId: string;
+  itemId: string;
+  itemType: string;
+  action: string;
+  createdAt: string;
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  userId: string;
+  status: "draft" | "submitted" | "under_review" | "needs_revision" | "approved" | "graded";
+  submittedAt?: string;
+  files: MediaItem[];
+  textFields?: Record<string, string>;
+  score?: number;
+  feedback?: string;
+}
+
+export interface SubmissionFile {
+  id: string;
+  filename: string;
+  url: string;
+  size: number;
+  mimetype: string;
+}
+
+export interface CourseDetail extends Course {
+  instructor?: string;
+  syllabus?: string;
+  materials?: string[];
+}
+
+export interface CourseOutlineItem {
+  id: string;
+  title: string;
+  type: string;
+  duration?: string;
+  completed?: boolean;
+}
+
+export const AssignmentSubmissionFormSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  projectUrl: z.string().url(),
+  notes: z.string().optional(),
+});
+
+export type AssignmentSubmissionForm = z.infer<typeof AssignmentSubmissionFormSchema>;
+
+export const AssignmentFormSchema = AssignmentSchema;
+export type AssignmentFormSchema = AssignmentSubmissionForm;
+
+export interface AssignmentRequirement {
+  id: string;
+  type: string;
+  label: string;
+  description: string;
+  required: boolean;
+  title?: string;
+}
+
+export interface RecommendationResponse {
+  recommendations: Array<{
+    id: string;
+    title: string;
+    type: string;
+    relevanceScore: number;
+    reason: string;
+  }>;
+}
+
+export type KnowledgeCategory = "theory" | "framework" | "lens" | "method";
+
+export interface AdaptationGuide {
+  id: string;
+  title: string;
+  description: string;
+  steps: string[];
+  adaptationTips?: string[];
+  exampleOutput?: string;
+}

@@ -14,15 +14,15 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { CustomPrompt, PromptTier } from "@shared/types";
 
 const tierLabels: Record<PromptTier, string> = {
-  beginner: "初级",
-  intermediate: "进阶",
-  advanced: "高级",
+  base: "基础",
+  advance: "进阶",
+  stretch: "拓展",
 };
 
 const tierColors: Record<PromptTier, string> = {
-  beginner: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100",
-  intermediate: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100",
-  advanced:
+  base: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100",
+  advance: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100",
+  stretch:
     "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100",
 };
 

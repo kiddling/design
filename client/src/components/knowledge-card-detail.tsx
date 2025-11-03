@@ -95,7 +95,7 @@ export function KnowledgeCardDetail({
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
-            <Badge variant="secondary">{categoryLabels[card.category]}</Badge>
+            <Badge variant="secondary">{categoryLabels[card.category as keyof typeof categoryLabels]}</Badge>
             <DifficultyBadge level={card.difficulty} />
             {userState.isStudied && (
               <Badge
@@ -158,7 +158,7 @@ export function KnowledgeCardDetail({
 
           <TabsContent value="examples" className="mt-4">
             <div className="space-y-3">
-              {card.examples.map((example, index) => (
+              {card.examples?.map((example: string, index: number) => (
                 <div
                   key={index}
                   className="flex gap-3 p-3 rounded-lg bg-muted/50 border"
@@ -176,7 +176,7 @@ export function KnowledgeCardDetail({
 
           <TabsContent value="tips" className="mt-4">
             <div className="space-y-3">
-              {card.applicationTips.map((tip, index) => (
+              {card.applicationTips?.map((tip: string, index: number) => (
                 <div
                   key={index}
                   className="flex gap-3 p-4 rounded-lg bg-accent/5 border border-accent/20"
@@ -193,7 +193,7 @@ export function KnowledgeCardDetail({
               <div>
                 <h3 className="text-sm font-semibold mb-3">推荐阅读</h3>
                 <div className="space-y-2">
-                  {card.recommendedReadings.map((reading, index) => (
+                  {card.recommendedReadings?.map((reading: any, index: number) => (
                     <div
                       key={index}
                       className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -234,7 +234,7 @@ export function KnowledgeCardDetail({
                         </div>
                         <div className="flex gap-1.5">
                           <Badge variant="outline" className="text-xs">
-                            {categoryLabels[relatedCard.category]}
+                            {categoryLabels[relatedCard.category as keyof typeof categoryLabels]}
                           </Badge>
                           <DifficultyBadge
                             level={relatedCard.difficulty}

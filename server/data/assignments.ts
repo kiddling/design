@@ -15,7 +15,7 @@ export function getSubmissions(assignmentId: string, userId: string): Submission
   const filePath = resolveStoragePath("submissions", `${userId}_${assignmentId}.json`);
   const submissions = readJSONFile<Submission[]>(filePath, []);
   return submissions.sort(
-    (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    (a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime()
   );
 }
 
@@ -25,7 +25,7 @@ export function saveSubmission(submission: Submission): void {
 
   submissions.push(submission);
   const ordered = submissions.sort(
-    (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    (a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime()
   );
 
   writeJSONFile(filePath, ordered);
@@ -53,91 +53,69 @@ function getDefaultAssignments(): Assignment[] {
       code: "PA-01",
       title: "观·元素解构",
       description: "通过观察日常物品，识别并解构设计中的点、线、面元素，培养设计观察力和分析能力。",
+      courseId: "course-01",
+      difficulty: "base",
+      type: "observation",
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
       requirements: [
         {
           id: "req-01",
-          title: "拍摄3张高质量照片",
+          label: "拍摄3张高质量照片",
           description: "选择3个日常物品或场景，拍摄包含清晰点、线、面元素的照片。要求光线充足、构图合理、焦点清晰。",
           type: "photo",
           required: true,
         },
         {
           id: "req-02",
-          title: "绘制解构分析图",
+          label: "绘制解构分析图",
           description: "使用Canva或其他工具，在照片上标注识别出的点、线、面元素，并用不同颜色区分。",
           type: "diagram",
           required: true,
         },
         {
           id: "req-03",
-          title: "撰写问题陈述",
+          label: "撰写问题陈述",
           description: "基于观察结果，撰写一个设计问题陈述（Problem Statement），说明你发现的设计现象或问题。",
           type: "text",
           required: true,
         },
         {
           id: "req-04",
-          title: "提出HMW问题",
+          label: "提出HMW问题",
           description: "根据问题陈述，提出一个\"我们如何...\"（How Might We）的开放性问题，启发解决方案思考。",
           type: "text",
           required: true,
         },
       ],
-      rubric: [
-        {
-          id: "criterion-01",
-          name: "观察深度",
-          weight: 30,
-          description: "评估学生对点、线、面元素的识别准确性和观察细致程度",
-          levels: [
-            { score: 30, label: "优秀", description: "准确识别所有关键元素，观察细致入微，有独特见解" },
-            { score: 24, label: "良好", description: "正确识别大部分元素，观察较为细致" },
-            { score: 18, label: "中等", description: "识别基本元素，观察深度一般" },
-            { score: 12, label: "及格", description: "识别部分元素，观察较为表面" },
-            { score: 0, label: "不及格", description: "未能识别关键元素或观察肤浅" },
-          ],
-        },
-        {
-          id: "criterion-02",
-          name: "解构清晰度",
-          weight: 30,
-          description: "评估解构图的标注清晰度、逻辑性和视觉表现力",
-          levels: [
-            { score: 30, label: "优秀", description: "标注清晰准确，逻辑严密，视觉表现出色" },
-            { score: 24, label: "良好", description: "标注清晰，逻辑合理，视觉表现良好" },
-            { score: 18, label: "中等", description: "标注基本清晰，逻辑尚可" },
-            { score: 12, label: "及格", description: "标注不够清晰或逻辑混乱" },
-            { score: 0, label: "不及格", description: "标注模糊或严重缺乏逻辑" },
-          ],
-        },
-        {
-          id: "criterion-03",
-          name: "问题定义",
-          weight: 30,
-          description: "评估问题陈述的准确性、相关性和HMW问题的开放性",
-          levels: [
-            { score: 30, label: "优秀", description: "问题定义精准，HMW问题开放且富有启发性" },
-            { score: 24, label: "良好", description: "问题定义合理，HMW问题较为开放" },
-            { score: 18, label: "中等", description: "问题定义基本合理，HMW问题一般" },
-            { score: 12, label: "及格", description: "问题定义不够准确或HMW问题不够开放" },
-            { score: 0, label: "不及格", description: "问题定义不当或HMW问题缺失" },
-          ],
-        },
-        {
-          id: "criterion-04",
-          name: "创新思维",
-          weight: 10,
-          description: "评估作业中体现的创新性和独特视角",
-          levels: [
-            { score: 10, label: "优秀", description: "展现出色的创新思维和独特视角" },
-            { score: 8, label: "良好", description: "有一定创新性和个人见解" },
-            { score: 6, label: "中等", description: "基本符合要求，创新性一般" },
-            { score: 4, label: "及格", description: "创新性不足" },
-            { score: 0, label: "不及格", description: "缺乏创新思维" },
-          ],
-        },
-      ],
+      rubric: {
+        criteria: [
+          {
+            id: "criterion-01",
+            name: "观察深度",
+            points: 30,
+            description: "评估学生对点、线、面元素的识别准确性和观察细致程度",
+          },
+          {
+            id: "criterion-02",
+            name: "解构清晰度",
+            points: 30,
+            description: "评估解构图的标注清晰度、逻辑性和视觉表现力",
+          },
+          {
+            id: "criterion-03",
+            name: "问题定义",
+            points: 30,
+            description: "评估问题陈述的准确性、相关性和HMW问题的开放性",
+          },
+          {
+            id: "criterion-04",
+            name: "创新思维",
+            points: 10,
+            description: "评估作业中体现的创新性和独特视角",
+          },
+        ],
+        totalPoints: 100,
+      },
       maxScore: 100,
       status: "published",
     },

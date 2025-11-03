@@ -20,10 +20,11 @@ interface CaseFiltersProps {
 
 const disciplines: Discipline[] = [
   "architecture",
-  "graphic-design",
-  "product-design",
-  "urban-planning",
-  "digital-media",
+  "graphic_design",
+  "industrial_design",
+  "fashion_design",
+  "interaction_design",
+  "general",
 ];
 
 const difficulties: Difficulty[] = ["base", "advance", "stretch"];
