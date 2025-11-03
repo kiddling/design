@@ -1,40 +1,38 @@
-export interface CourseOutlineItem {
+export type Discipline =
+  | "architecture"
+  | "graphic-design"
+  | "product-design"
+  | "urban-planning"
+  | "digital-media";
+
+export type Difficulty = "base" | "advance" | "stretch";
+
+export interface Case {
   id: string;
   title: string;
-  description: string;
-  week: number;
+  discipline: Discipline;
+  tags: string[];
+  difficulty: Difficulty;
+  imageUrl?: string;
+  keyInsight: string;
+  problem: string;
+  deconstruction: string;
+  solution: string;
+  references: Reference[];
+  relatedKnowledge: string[];
+  isFavorite?: boolean;
 }
 
-export interface CourseDetail extends CourseOutlineItem {
-  objectives: string[];
-  resources: string[];
-  image: string;
-}
-
-export interface KnowledgeCard {
-  id: string;
+export interface Reference {
   title: string;
-  summary: string;
-  category: string;
+  url: string;
+  type: "article" | "video" | "book" | "website";
 }
 
-export interface CaseStudy {
-  id: string;
-  title: string;
-  discipline: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  thumbnail: string;
-}
-
-export interface PromptTemplate {
-  id: string;
-  label: string;
-  prompt: string;
-}
-
-export interface AssignmentFormSchema {
-  name: string;
-  email: string;
-  projectUrl: string;
-  notes?: string;
+export interface CaseFilters {
+  disciplines: Discipline[];
+  tags: string[];
+  difficulty: Difficulty[];
+  search: string;
+  favorites: boolean;
 }
