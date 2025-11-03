@@ -1,41 +1,38 @@
-export type PromptTier = "beginner" | "intermediate" | "advanced";
+export type Discipline =
+  | "architecture"
+  | "graphic-design"
+  | "product-design"
+  | "urban-planning"
+  | "digital-media";
 
-export interface PromptTemplate {
+export type Difficulty = "base" | "advance" | "stretch";
+
+export interface Case {
   id: string;
   title: string;
-  tier: PromptTier;
-  role: string;
-  task: string;
-  methodology: string;
-  expectedOutput: string;
+  discipline: Discipline;
   tags: string[];
-  category: string;
-  createdAt: string;
+  difficulty: Difficulty;
+  imageUrl?: string;
+  keyInsight: string;
+  problem: string;
+  deconstruction: string;
+  solution: string;
+  references: Reference[];
+  relatedKnowledge: string[];
+  isFavorite?: boolean;
 }
 
-export interface CustomPrompt {
-  id: string;
+export interface Reference {
   title: string;
-  content: string;
+  url: string;
+  type: "article" | "video" | "book" | "website";
+}
+
+export interface CaseFilters {
+  disciplines: Discipline[];
   tags: string[];
-  tier: PromptTier;
-  isFavorite: boolean;
-  createdAt: string;
-  updatedAt: string;
-  baseTemplateId?: string;
-}
-
-export interface PromptRecommendation {
-  id: string;
-  promptId: string;
-  courseId: string;
-  relevanceScore: number;
-  reason: string;
-}
-
-export interface AdaptationGuide {
-  tool: string;
-  description: string;
-  adaptationTips: string[];
-  exampleOutput: string;
+  difficulty: Difficulty[];
+  search: string;
+  favorites: boolean;
 }
