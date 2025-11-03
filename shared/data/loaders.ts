@@ -9,11 +9,19 @@ import {
   BookSchema,
   AssignmentSchema,
   EntityRelationSchema,
+  PromptTemplate,
+  CaseStudy,
+  KnowledgeCardDetail,
+  Workflow,
+  ResourceItem,
+  Book,
+  Assignment,
+  EntityRelation,
 } from "../types/index.js";
 import { digitalDesignCompositionCourse } from "./course.js";
 import { knowledgeCards } from "./knowledge-cards.js";
 import { caseStudies } from "./case-studies.js";
-import { promptTemplates } from "./prompts.js";
+import { promptTemplates } from "../mockData.js";
 import { workflows } from "./workflows.js";
 import { resources, books } from "./resources.js";
 import { assignments } from "./assignments.js";
@@ -191,7 +199,7 @@ export function getKnowledgeCards() {
 
 export function getKnowledgeCardById(id: string) {
   const cards = getKnowledgeCards();
-  return cards!.find(card => card.id === id);
+  return cards!.find((card: KnowledgeCardDetail) => card.id === id);
 }
 
 export function getCaseStudies() {
@@ -206,7 +214,7 @@ export function getCaseStudies() {
 
 export function getCaseStudyById(id: string) {
   const cases = getCaseStudies();
-  return cases.find(caseStudy => caseStudy.id === id);
+  return cases.find((caseStudy: CaseStudy) => caseStudy.id === id);
 }
 
 export function getPrompts() {
@@ -219,7 +227,7 @@ export function getPrompts() {
 
 export function getPromptById(id: string) {
   const prompts = getPrompts();
-  return prompts.find(prompt => prompt.id === id);
+  return prompts.find((prompt: PromptTemplate) => prompt.id === id);
 }
 
 export function getWorkflows() {
@@ -245,7 +253,7 @@ export function getResources() {
 
 export function getResourceById(id: string) {
   const resourcesData = getResources();
-  return resourcesData.find(resource => resource.id === id);
+  return resourcesData.find((resource: ResourceItem) => resource.id === id);
 }
 
 export function getBooks() {
@@ -258,7 +266,7 @@ export function getBooks() {
 
 export function getBookById(id: string) {
   const booksData = getBooks();
-  return booksData.find(book => book.id === id);
+  return booksData.find((book: Book) => book.id === id);
 }
 
 export function getAssignments() {
@@ -271,12 +279,12 @@ export function getAssignments() {
 
 export function getAssignmentById(id: string) {
   const assignmentsData = getAssignments();
-  return assignmentsData.find(assignment => assignment.id === id);
+  return assignmentsData.find((assignment: Assignment) => assignment.id === id);
 }
 
 export function getAssignmentsByLessonId(lessonId: string) {
   const assignmentsData = getAssignments();
-  return assignmentsData.filter(assignment => assignment.lessonId === lessonId);
+  return assignmentsData.filter((assignment: Assignment) => assignment.lessonId === lessonId);
 }
 
 export function getRelationships() {
@@ -292,7 +300,7 @@ export function getRelationships() {
 export function getRelatedEntities(entityId: string, relationType?: string) {
   const relationships = getRelationships();
   return relationships.filter(
-    rel =>
+    (rel: EntityRelation) =>
       (rel.fromId === entityId || rel.toId === entityId) &&
       (!relationType || rel.relationType === relationType)
   );
@@ -301,14 +309,14 @@ export function getRelatedEntities(entityId: string, relationType?: string) {
 export function getPrerequisites(entityId: string) {
   const relationships = getRelationships();
   return relationships.filter(
-    rel => rel.toId === entityId && rel.relationType === "prerequisite"
+    (rel: EntityRelation) => rel.toId === entityId && rel.relationType === "prerequisite"
   );
 }
 
 export function getDependents(entityId: string) {
   const relationships = getRelationships();
   return relationships.filter(
-    rel => rel.fromId === entityId && rel.relationType === "prerequisite"
+    (rel: EntityRelation) => rel.fromId === entityId && rel.relationType === "prerequisite"
   );
 }
 

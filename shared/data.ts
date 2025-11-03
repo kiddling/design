@@ -1,6 +1,5 @@
 import type {
   AssignmentFormSchema,
-  CaseStudy,
   CourseDetail,
   CourseOutlineItem,
   KnowledgeCard,
@@ -79,7 +78,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   },
 ];
 
-export const caseStudies: CaseStudy[] = [
+export const caseStudies = [
   {
     id: "c1",
     title: "抽象构成展",
@@ -106,12 +105,10 @@ export const caseStudies: CaseStudy[] = [
 export const promptTemplates: PromptTemplate[] = [
   {
     id: "p1",
-    label: "Generative poster",
     prompt: "Poster design exploring point-line-plane relationships with stark contrast",
   },
   {
     id: "p2",
-    label: "Material collage",
     prompt: "Collage of tactile materials photographed under soft daylight",
   },
 ];
