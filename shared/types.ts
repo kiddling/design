@@ -36,3 +36,43 @@ export interface CaseFilters {
   search: string;
   favorites: boolean;
 }
+
+export interface KnowledgeCard {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+}
+
+export interface CardRelationship {
+  source: string;
+  target: string;
+  type: "related" | "prerequisite";
+}
+
+export interface PromptTemplate {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  prompt: string;
+}
+
+export interface AdaptationGuide {
+  id: string;
+  title: string;
+  description: string;
+  tool: string;
+}
+
+export interface Workflow {
+    id: string;
+    title: string;
+    description: string;
+    steps: {
+        title: string;
+        description: string;
+    }[];
+}
+
+
