@@ -36,9 +36,9 @@ export default function AssignmentDetailPage() {
         getUserProgress(assignmentId),
       ]);
 
-      setAssignment(assignmentData);
-      setSubmissions(submissionsData);
-      setProgress(progressData);
+      setAssignment(assignmentData ?? null);
+      setSubmissions(Array.isArray(submissionsData) ? submissionsData : []);
+      setProgress(progressData ?? null);
     } catch (err) {
       setError("无法加载作业详情");
       console.error("Failed to load assignment data:", err);
@@ -72,6 +72,25 @@ export default function AssignmentDetailPage() {
     );
   }
 
+  const assignmentData = assignment as unknown as {
+    requirements?: unknown;
+    rubric?: any;
+    maxScore?: number;
+  };
+  const requirements = Array.isArray(assignmentData.requirements) ? (assignmentData.requirements as any[]) : [];
+  const rubricSource = assignmentData.rubric;
+  const rubric = Array.isArray(rubricSource)
+    ? rubricSource
+    : Array.isArray(rubricSource?.criteria)
+      ? rubricSource.criteria
+      : [];
+  const derivedMaxScore = typeof assignment.maxScore === "number"
+    ? assignment.maxScore
+    : typeof rubricSource?.totalPoints === "number"
+      ? rubricSource.totalPoints
+      : assignment.maxScore;
+  const submissionList = Array.isArray(submissions) ? submissions : [];
+
   return (
     <div className="space-y-6">
       <button
@@ -98,7 +117,7 @@ export default function AssignmentDetailPage() {
         <div className="space-y-6">
           <RequirementsChecklist
             assignmentId={assignment.id}
-            requirements={assignment.requirements}
+            requirements={requirements}
             progress={progress}
             onProgressChange={(checklist) => {
               setProgress((prev) =>
@@ -114,14 +133,14 @@ export default function AssignmentDetailPage() {
             }}
           />
 
-          <RubricVisualization rubric={assignment.rubric} maxScore={assignment.maxScore} />
+          <RubricVisualization rubric={rubric} maxScore={derivedMaxScore} />
         </div>
 
         <div className="space-y-6">
           <SubmissionForm
             assignmentId={assignment.id}
-            requirements={assignment.requirements}
-            hasPreviousSubmissions={submissions.length > 0}
+            requirements={requirements}
+            hasPreviousSubmissions={submissionList.length > 0}
             onSubmitSuccess={() => {
               loadAssignmentData();
             }}
@@ -129,8 +148,8 @@ export default function AssignmentDetailPage() {
         </div>
       </div>
 
-      {submissions.length > 0 && (
-        <SubmissionHistory submissions={submissions} assignmentCode={assignment.code} />
+      {submissionList.length > 0 && (
+        <SubmissionHistory submissions={submissionList} assignmentCode={assignment.code} />
       )}
     </div>
   );

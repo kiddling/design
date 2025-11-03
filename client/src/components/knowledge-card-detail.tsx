@@ -49,6 +49,12 @@ export function KnowledgeCardDetail({
 }: KnowledgeCardDetailProps) {
   if (!card) return null;
 
+  const tags = Array.isArray(card.tags) ? card.tags : [];
+  const examples = Array.isArray(card.examples) ? card.examples : [];
+  const applicationTips = Array.isArray(card.applicationTips) ? card.applicationTips : [];
+  const recommendedReadings = Array.isArray((card as any).recommendedReadings) ? (card as any).recommendedReadings : [];
+  const relatedList = Array.isArray(relatedCards) ? relatedCards : [];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -105,7 +111,7 @@ export function KnowledgeCardDetail({
                 ✓ 已学习
               </Badge>
             )}
-            {card.tags.map(tag => (
+            {tags.map(tag => (
               <Badge key={tag} variant="outline">
                 {tag}
               </Badge>
@@ -158,33 +164,41 @@ export function KnowledgeCardDetail({
 
           <TabsContent value="examples" className="mt-4">
             <div className="space-y-3">
-              {card.examples.map((example, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3 p-3 rounded-lg bg-muted/50 border"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
-                    {index + 1}
+              {examples.length === 0 ? (
+                <p className="text-sm text-muted-foreground">暂无案例示例。</p>
+              ) : (
+                examples.map((example, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-3 p-3 rounded-lg bg-muted/50 border"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
+                      {index + 1}
+                    </div>
+                    <p className="flex-1 text-sm leading-relaxed pt-1">
+                      {example}
+                    </p>
                   </div>
-                  <p className="flex-1 text-sm leading-relaxed pt-1">
-                    {example}
-                  </p>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="tips" className="mt-4">
             <div className="space-y-3">
-              {card.applicationTips.map((tip, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3 p-4 rounded-lg bg-accent/5 border border-accent/20"
-                >
-                  <Lightbulb className="flex-shrink-0 h-5 w-5 text-accent mt-0.5" />
-                  <p className="flex-1 text-sm leading-relaxed">{tip}</p>
-                </div>
-              ))}
+              {applicationTips.length === 0 ? (
+                <p className="text-sm text-muted-foreground">暂无应用技巧。</p>
+              ) : (
+                applicationTips.map((tip, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-3 p-4 rounded-lg bg-accent/5 border border-accent/20"
+                  >
+                    <Lightbulb className="flex-shrink-0 h-5 w-5 text-accent mt-0.5" />
+                    <p className="flex-1 text-sm leading-relaxed">{tip}</p>
+                  </div>
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -193,37 +207,41 @@ export function KnowledgeCardDetail({
               <div>
                 <h3 className="text-sm font-semibold mb-3">推荐阅读</h3>
                 <div className="space-y-2">
-                  {card.recommendedReadings.map((reading, index) => (
-                    <div
-                      key={index}
-                      className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="font-medium text-sm">{reading.title}</div>
-                      {reading.author && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          作者：{reading.author}
-                        </div>
-                      )}
-                      {reading.url && (
-                        <a
-                          href={reading.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline mt-1 inline-block"
-                        >
-                          查看链接 →
-                        </a>
-                      )}
-                    </div>
-                  ))}
+                  {recommendedReadings.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">暂无推荐阅读资源。</p>
+                  ) : (
+                    recommendedReadings.map((reading: any, index: number) => (
+                      <div
+                        key={reading.id ?? index}
+                        className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="font-medium text-sm">{reading.title ?? "未命名资源"}</div>
+                        {reading.author && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            作者：{reading.author}
+                          </div>
+                        )}
+                        {reading.url && (
+                          <a
+                            href={reading.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline mt-1 inline-block"
+                          >
+                            查看链接 →
+                          </a>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
-              {relatedCards.length > 0 && (
+              {relatedList.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold mb-3">相关知识卡片</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {relatedCards.map(relatedCard => (
+                    {relatedList.map(relatedCard => (
                       <button
                         key={relatedCard.id}
                         onClick={() => onRelatedCardClick(relatedCard.id)}

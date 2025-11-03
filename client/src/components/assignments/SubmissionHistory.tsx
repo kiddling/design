@@ -10,26 +10,32 @@ interface SubmissionHistoryProps {
 }
 
 export default function SubmissionHistory({ submissions, assignmentCode }: SubmissionHistoryProps) {
+  const submissionList = Array.isArray(submissions) ? submissions : [];
+
   return (
     <section className="rounded-lg border border-white/10 bg-slate-900/60 p-6">
       <header className="border-b border-white/5 pb-4">
         <h2 className="text-xl font-semibold text-white">提交历史</h2>
         <p className="mt-1 text-sm text-slate-400">
-          你已提交 {submissions.length} 个版本，最新版本在最上方
+          你已提交 {submissionList.length} 个版本，最新版本在最上方
         </p>
       </header>
 
-      <ul className="mt-6 space-y-4">
-        {submissions.map((submission, index) => (
-          <SubmissionItem
-            key={submission.id}
-            submission={submission}
-            assignmentCode={assignmentCode}
-            isLatest={index === 0}
-            versionNumber={submissions.length - index}
-          />
-        ))}
-      </ul>
+      {submissionList.length === 0 ? (
+        <p className="mt-6 text-sm text-slate-400">暂时没有提交记录。</p>
+      ) : (
+        <ul className="mt-6 space-y-4">
+          {submissionList.map((submission, index) => (
+            <SubmissionItem
+              key={submission.id ?? index}
+              submission={submission}
+              assignmentCode={assignmentCode}
+              isLatest={index === 0}
+              versionNumber={submissionList.length - index}
+            />
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -44,9 +50,11 @@ interface SubmissionItemProps {
 function SubmissionItem({ submission, assignmentCode, isLatest, versionNumber }: SubmissionItemProps) {
   const [expanded, setExpanded] = useState(isLatest);
 
-  const photos = submission.files.filter((file) => file.type === "photo");
-  const diagrams = submission.files.filter((file) => file.type === "diagram");
-  const documents = submission.files.filter((file) => file.type === "document");
+  const files = Array.isArray(submission.files) ? submission.files : [];
+  const textFields = (submission as any).textFields ?? {};
+  const photos = files.filter((file) => file.type === "photo");
+  const diagrams = files.filter((file) => file.type === "diagram");
+  const documents = files.filter((file) => file.type === "document");
 
   return (
     <li className="rounded-lg border border-white/10 bg-slate-950/40 p-4">
@@ -102,33 +110,33 @@ function SubmissionItem({ submission, assignmentCode, isLatest, versionNumber }:
 
       {expanded && (
         <div className="mt-4 space-y-4 border-t border-white/5 pt-4">
-          {submission.textFields.problemStatement && (
+          {textFields.problemStatement && (
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white">问题陈述</h4>
-              <p className="text-sm leading-relaxed text-slate-300">{submission.textFields.problemStatement}</p>
+              <p className="text-sm leading-relaxed text-slate-300">{textFields.problemStatement}</p>
             </div>
           )}
 
-          {submission.textFields.hmwQuestion && (
+          {textFields.hmwQuestion && (
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white">HMW 问题</h4>
-              <p className="text-sm leading-relaxed text-slate-300">{submission.textFields.hmwQuestion}</p>
+              <p className="text-sm leading-relaxed text-slate-300">{textFields.hmwQuestion}</p>
             </div>
           )}
 
-          {submission.textFields.notes && (
+          {textFields.notes && (
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white">补充说明</h4>
-              <p className="text-sm leading-relaxed text-slate-300">{submission.textFields.notes}</p>
+              <p className="text-sm leading-relaxed text-slate-300">{textFields.notes}</p>
             </div>
           )}
 
-          {submission.files.length > 0 && (
+          {files.length > 0 && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-white">附件列表</h4>
               <ul className="space-y-2">
-                {submission.files.map((file) => (
-                  <FileListItem key={file.id} file={file} assignmentCode={assignmentCode} />
+                {files.map((file) => (
+                  <FileListItem key={file.id ?? file.path} file={file} assignmentCode={assignmentCode} />
                 ))}
               </ul>
             </div>

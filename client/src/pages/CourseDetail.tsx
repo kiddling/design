@@ -10,6 +10,9 @@ function CourseContent({ courseId }: { courseId: string }) {
     return null;
   }
 
+  const objectives = Array.isArray((data as any).objectives) ? (data.objectives as string[]) : [];
+  const resources = Array.isArray((data as any).resources) ? (data.resources as string[]) : [];
+
   return (
     <>
       <header className="page-header">
@@ -19,20 +22,28 @@ function CourseContent({ courseId }: { courseId: string }) {
 
       <section aria-labelledby="objectives-heading" className="vertical-stack">
         <h3 id="objectives-heading">Objectives</h3>
-        <ul>
-          {data.objectives.map((objective) => (
-            <li key={objective}>{objective}</li>
-          ))}
-        </ul>
+        {objectives.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No objectives available yet.</p>
+        ) : (
+          <ul>
+            {objectives.map((objective, index) => (
+              <li key={`${objective}-${index}`}>{objective}</li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section aria-labelledby="resources-heading" className="vertical-stack">
         <h3 id="resources-heading">Resources</h3>
-        <ul>
-          {data.resources.map((resource) => (
-            <li key={resource}>{resource}</li>
-          ))}
-        </ul>
+        {resources.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No resources available.</p>
+        ) : (
+          <ul>
+            {resources.map((resource, index) => (
+              <li key={`${resource}-${index}`}>{resource}</li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <figure>

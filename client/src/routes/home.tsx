@@ -13,6 +13,8 @@ export default function HomePage() {
     queryFn: () => courseApi.getCourses().then((res) => res.data),
   });
 
+  const courseList = Array.isArray(courses) ? courses : [];
+
   return (
     <div className="min-h-screen bg-background">
       <div className="relative bg-gradient-to-b from-primary/10 via-background to-background">
@@ -59,52 +61,64 @@ export default function HomePage() {
           <div className="flex justify-center py-12">
             <BookOpen className="h-12 w-12 animate-pulse text-muted-foreground" />
           </div>
+        ) : courseList.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-white/10 bg-slate-900/40 px-6 py-10 text-center text-sm text-muted-foreground">
+            暂无可用课程，请稍后再试。
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses?.map((course, index) => (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="h-full hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <Badge variant="secondary">{course.metadata.level}</Badge>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{course.duration}</span>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {courseList.map((course, index) => {
+              const metadata = (course as any)?.metadata ?? {};
+              const level = metadata?.level ?? "待定";
+              const tags = Array.isArray(metadata?.tags) ? metadata.tags : [];
+              const displayTags = tags.slice(0, 3);
+              const courseHref = course.id ? `/courses/${course.id}` : "#";
+
+              return (
+                <motion.div
+                  key={course.id ?? `course-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full transition-shadow hover:shadow-lg">
+                    <CardHeader>
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <Badge variant="secondary">{level}</Badge>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          <span>{course.duration ?? "--"}</span>
+                        </div>
                       </div>
-                    </div>
-                    <CardTitle className="text-xl">{course.title}</CardTitle>
-                    {course.subtitle && (
-                      <CardDescription className="text-xs uppercase tracking-wider">
-                        {course.subtitle}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {course.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {course.metadata.tags.slice(0, 3).map((tag, i) => (
-                        <Badge key={i} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <Button asChild className="w-full">
-                      <Link href={`/courses/${course.id}`}>
-                        查看课程
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                      <CardTitle className="text-xl">{course.title ?? "未命名课程"}</CardTitle>
+                      {course.subtitle && (
+                        <CardDescription className="text-xs uppercase tracking-wider">
+                          {course.subtitle}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-4 text-sm text-muted-foreground line-clamp-3">
+                        {course.description ?? "课程详情即将上线，敬请期待。"}
+                      </p>
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        {displayTags.map((tag, i) => (
+                          <Badge key={`${course.id ?? index}-tag-${i}`} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <Button asChild className="w-full">
+                        <Link href={courseHref} aria-disabled={!course.id}>
+                          查看课程
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>

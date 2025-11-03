@@ -18,7 +18,7 @@ export default function AssignmentsPage() {
     try {
       setLoading(true);
       const data = await getAssignments();
-      setAssignments(data);
+      setAssignments(Array.isArray(data) ? data : []);
     } catch (err) {
       setError("无法加载作业列表");
       console.error("Failed to load assignments:", err);
@@ -43,6 +43,8 @@ export default function AssignmentsPage() {
     );
   }
 
+  const assignmentList = Array.isArray(assignments) ? assignments : [];
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -50,11 +52,17 @@ export default function AssignmentsPage() {
         <p className="text-slate-400">查看和提交课程作业</p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
-        {assignments.map((assignment) => (
-          <AssignmentCard key={assignment.id} assignment={assignment} />
-        ))}
-      </div>
+      {assignmentList.length === 0 ? (
+        <div className="rounded-lg border border-white/10 bg-slate-900/60 px-6 py-10 text-center text-slate-400">
+          暂时没有可用的作业。
+        </div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
+          {assignmentList.map((assignment) => (
+            <AssignmentCard key={assignment.id} assignment={assignment} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -65,6 +73,7 @@ interface AssignmentCardProps {
 
 function AssignmentCard({ assignment }: AssignmentCardProps) {
   const timeDiff = getTimeDiff(assignment.dueDate);
+  const requirementCount = Array.isArray(assignment.requirements) ? assignment.requirements.length : 0;
 
   return (
     <Link href={`/assignments/${assignment.id}`}>
@@ -117,7 +126,7 @@ function AssignmentCard({ assignment }: AssignmentCardProps) {
                 )}
               </div>
               <div className="rounded-md bg-white/5 px-2 py-1">
-                {assignment.requirements.length} 项要求
+                {requirementCount} 项要求
               </div>
             </div>
           </div>
