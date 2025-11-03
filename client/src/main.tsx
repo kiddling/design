@@ -1,16 +1,22 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./index.css";
+import { Router, Route, Switch } from "wouter";
 
-const rootElement = document.getElementById("root");
+import AppLayout from "./pages/AppLayout";
+import AssignmentsPage from "./pages/AssignmentsPage";
+import AssignmentDetailPage from "./pages/AssignmentDetailPage";
+import "./styles/global.css";
 
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
-
-createRoot(rootElement).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <App />
+    <Router>
+      <AppLayout>
+        <Switch>
+          <Route path="/" component={AssignmentsPage} />
+          <Route path="/assignments" component={AssignmentsPage} />
+          <Route path="/assignments/:assignmentId" component={AssignmentDetailPage} />
+        </Switch>
+      </AppLayout>
+    </Router>
   </StrictMode>
 );
