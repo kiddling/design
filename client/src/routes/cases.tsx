@@ -1,3 +1,3 @@
-import CasesPage from "@/pages/cases";
+import CasesPage from "@/pages/Cases";
 
 export default CasesPage;

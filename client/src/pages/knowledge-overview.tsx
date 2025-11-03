@@ -398,3 +398,5 @@ export function KnowledgeOverview() {
     </div>
   );
 }
+
+export default KnowledgeOverview;

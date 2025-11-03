@@ -94,6 +94,7 @@ export const SubmissionStatus = {
   UNDER_REVIEW: "under_review",
   NEEDS_REVISION: "needs_revision",
   APPROVED: "approved",
+  GRADED: "graded",
 } as const;
 
 export const SubmissionStatusSchema = z.enum([
@@ -102,6 +103,7 @@ export const SubmissionStatusSchema = z.enum([
   "under_review",
   "needs_revision",
   "approved",
+  "graded",
 ]);
 export type SubmissionStatus = z.infer<typeof SubmissionStatusSchema>;
 
