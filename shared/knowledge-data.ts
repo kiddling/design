@@ -1,10 +1,10 @@
-import { KnowledgeCard, CardRelationship } from "./legacy-types";
+import { KnowledgeCard, EntityRelation as CardRelationship } from "./types";
 
 export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "kandinsky-point-line-plane",
     title: "康定斯基：点线面",
-    titleEn: "Kandinsky: Point, Line, Plane",
+    description: "康定斯基将视觉元素归纳为点、线、面三种基本形态，为现代抽象艺术和设计构成理论奠定基础。",
     category: "theory",
     difficulty: "base",
     summary:
@@ -36,13 +36,13 @@ export const knowledgeCards: KnowledgeCard[] = [
         url: "https://www.theartstory.org/artist/kandinsky-wassily/",
       },
     ],
-    relatedCards: ["bauhaus-principles", "workflow-lens-form"],
+    relatedCases: ["bauhaus-principles", "workflow-lens-form"],
     tags: ["构成理论", "抽象艺术", "视觉语言", "基础元素"],
   },
   {
     id: "bauhaus-principles",
     title: "包豪斯设计原则",
-    titleEn: "Bauhaus Design Principles",
+    description: "包豪斯倡导「形式追随功能」，强调艺术与技术的结合，追求简洁、实用、现代的设计美学。",
     category: "theory",
     difficulty: "base",
     summary:
@@ -76,13 +76,13 @@ export const knowledgeCards: KnowledgeCard[] = [
         url: "https://www.bauhaus100.com/",
       },
     ],
-    relatedCards: ["kandinsky-point-line-plane", "workflow-lens-function"],
+    relatedCases: ["kandinsky-point-line-plane", "workflow-lens-function"],
     tags: ["设计运动", "现代主义", "功能主义", "几何美学"],
   },
   {
     id: "workflow-lens-form",
     title: "工作流透镜：形态",
-    titleEn: "Workflow Lens: Form",
+    description: "从形态角度审视设计，关注点线面的组合、比例、节奏和平衡，创造视觉美感。",
     category: "lens",
     difficulty: "base",
     summary:
@@ -112,7 +112,7 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Robert Bringhurst",
       },
     ],
-    relatedCards: [
+    relatedCases: [
       "kandinsky-point-line-plane",
       "workflow-lens-space",
       "workflow-lens-function",
@@ -122,7 +122,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "workflow-lens-function",
     title: "工作流透镜：功能",
-    titleEn: "Workflow Lens: Function",
+    description: "从功能角度审视设计，确保设计满足用户需求，解决实际问题，实现设计目标。",
     category: "lens",
     difficulty: "base",
     summary:
@@ -152,7 +152,7 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Steve Krug",
       },
     ],
-    relatedCards: [
+    relatedCases: [
       "bauhaus-principles",
       "workflow-lens-user",
       "workflow-lens-context",
@@ -162,7 +162,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "workflow-lens-space",
     title: "工作流透镜：空间",
-    titleEn: "Workflow Lens: Space",
+    description: "从空间角度审视设计，关注层次、深度、留白和视觉动线，创造空间感和呼吸感。",
     category: "lens",
     difficulty: "advance",
     summary:
@@ -192,7 +192,7 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "原研哉",
       },
     ],
-    relatedCards: [
+    relatedCases: [
       "kandinsky-point-line-plane",
       "workflow-lens-form",
       "gehl-life-between-buildings",
@@ -202,7 +202,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "workflow-lens-user",
     title: "工作流透镜：用户",
-    titleEn: "Workflow Lens: User",
+    description: "从用户角度审视设计，关注用户的需求、行为、情感和体验，创造以人为本的设计。",
     category: "lens",
     difficulty: "advance",
     summary:
@@ -232,7 +232,7 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Aarron Walter",
       },
     ],
-    relatedCards: [
+    relatedCases: [
       "workflow-lens-function",
       "workflow-lens-context",
       "gehl-life-between-buildings",
@@ -242,7 +242,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "workflow-lens-context",
     title: "工作流透镜：语境",
-    titleEn: "Workflow Lens: Context",
+    description: "从语境角度审视设计，考虑文化、环境、历史和社会因素，创造有意义的设计。",
     category: "lens",
     difficulty: "advance",
     summary:
@@ -272,13 +272,13 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Malcolm Barnard",
       },
     ],
-    relatedCards: ["workflow-lens-user", "gehl-life-between-buildings"],
+    relatedCases: ["workflow-lens-user", "gehl-life-between-buildings"],
     tags: ["文化研究", "环境设计", "社会责任", "本地化"],
   },
   {
     id: "gehl-life-between-buildings",
     title: "扬·盖尔：建筑之间的生活",
-    titleEn: "Jan Gehl: Life Between Buildings",
+    description: "扬·盖尔关注人在公共空间中的活动和体验，强调以人为本的城市和建筑设计。",
     category: "framework",
     difficulty: "advance",
     summary:
@@ -312,7 +312,7 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Jan Gehl & Birgitte Svarre",
       },
     ],
-    relatedCards: [
+    relatedCases: [
       "workflow-lens-user",
       "workflow-lens-context",
       "workflow-lens-space",
@@ -322,7 +322,7 @@ export const knowledgeCards: KnowledgeCard[] = [
   {
     id: "gestalt-principles",
     title: "格式塔原理",
-    titleEn: "Gestalt Principles",
+    description: "格式塔心理学揭示了人类视觉感知的基本原理，包括接近、相似、连续、闭合等法则。",
     category: "theory",
     difficulty: "base",
     summary:
@@ -353,70 +353,70 @@ export const knowledgeCards: KnowledgeCard[] = [
         author: "Wolfgang Metzger",
       },
     ],
-    relatedCards: ["kandinsky-point-line-plane", "workflow-lens-form"],
+    relatedCases: ["kandinsky-point-line-plane", "workflow-lens-form"],
     tags: ["视觉心理学", "认知科学", "感知原理", "构成法则"],
   },
 ];
 
 export const cardRelationships: CardRelationship[] = [
   {
-    from: "kandinsky-point-line-plane",
-    to: "workflow-lens-form",
-    type: "application",
+    fromId: "kandinsky-point-line-plane",
+    toId: "workflow-lens-form",
+    relationType: "application",
     description: "点线面理论是形态透镜分析的基础",
   },
   {
-    from: "kandinsky-point-line-plane",
-    to: "bauhaus-principles",
-    type: "related",
+    fromId: "kandinsky-point-line-plane",
+    toId: "bauhaus-principles",
+    relationType: "related",
     description: "康定斯基在包豪斯任教，理论相互影响",
   },
   {
-    from: "bauhaus-principles",
-    to: "workflow-lens-function",
-    type: "application",
+    fromId: "bauhaus-principles",
+    toId: "workflow-lens-function",
+    relationType: "application",
     description: "包豪斯功能主义体现在功能透镜中",
   },
   {
-    from: "workflow-lens-form",
-    to: "workflow-lens-space",
-    type: "prerequisite",
+    fromId: "workflow-lens-form",
+    toId: "workflow-lens-space",
+    relationType: "prerequisite",
     description: "理解形态是掌握空间的基础",
   },
   {
-    from: "workflow-lens-function",
-    to: "workflow-lens-user",
-    type: "related",
+    fromId: "workflow-lens-function",
+    toId: "workflow-lens-user",
+    relationType: "related",
     description: "功能设计需要考虑用户需求",
   },
   {
-    from: "workflow-lens-user",
-    to: "workflow-lens-context",
-    type: "related",
+    fromId: "workflow-lens-user",
+    toId: "workflow-lens-context",
+    relationType: "related",
     description: "用户理解需要考虑文化语境",
   },
   {
-    from: "workflow-lens-space",
-    to: "gehl-life-between-buildings",
-    type: "application",
+    fromId: "workflow-lens-space",
+    toId: "gehl-life-between-buildings",
+    relationType: "application",
     description: "空间设计在城市规划中的应用",
   },
   {
-    from: "workflow-lens-user",
-    to: "gehl-life-between-buildings",
-    type: "related",
+    fromId: "workflow-lens-user",
+    toId: "gehl-life-between-buildings",
+    relationType: "related",
     description: "以人为本的设计理念",
   },
   {
-    from: "gestalt-principles",
-    to: "kandinsky-point-line-plane",
-    type: "related",
+    fromId: "gestalt-principles",
+    toId: "kandinsky-point-line-plane",
+    relationType: "related",
     description: "视觉感知原理与形式元素理论相互支持",
   },
   {
-    from: "gestalt-principles",
-    to: "workflow-lens-form",
-    type: "prerequisite",
+    fromId: "gestalt-principles",
+    toId: "workflow-lens-form",
+    relationType: "prerequisite",
     description: "格式塔原理是形态分析的理论基础",
   },
 ];

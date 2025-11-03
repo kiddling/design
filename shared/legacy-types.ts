@@ -45,9 +45,10 @@ export interface KnowledgeCard {
 }
 
 export interface CardRelationship {
-  source: string;
-  target: string;
-  type: "related" | "prerequisite";
+  fromId: string;
+  toId: string;
+  relationType: "related" | "prerequisite" | "application";
+  description?: string;
 }
 
 export interface PromptTemplate {
@@ -56,6 +57,13 @@ export interface PromptTemplate {
   description: string;
   category: string;
   prompt: string;
+  tier?: string;
+  role?: string;
+  task?: string;
+  methodology?: string;
+  expectedOutput?: string;
+  createdAt?: string;
+  tags?: string[];
 }
 
 export interface AdaptationGuide {
@@ -63,6 +71,8 @@ export interface AdaptationGuide {
   title: string;
   description: string;
   tool: string;
+  adaptationTips?: string[];
+  exampleOutput?: string;
 }
 
 export interface Workflow {

@@ -68,6 +68,7 @@ export const PromptTemplateSchema = z.object({
   category: z.string().optional(),
   prompt: z.string().optional(),
   label: z.string().optional(),
+  createdAt: z.string().optional(),
 });
 
 export type PromptTemplate = z.infer<typeof PromptTemplateSchema>;
@@ -174,7 +175,6 @@ export const KnowledgeCardSchema = z.object({
   mediaUrl: z.string().optional(),
   examples: z.array(z.string()).optional(),
   applicationTips: z.array(z.string()).optional(),
-  titleEn: z.string().optional(),
   recommendedReadings: z.array(z.any()).optional(),
 });
 
@@ -422,6 +422,18 @@ export const UserProgressSchema = z.object({
 
 export type UserProgress = z.infer<typeof UserProgressSchema>;
 
+export const AdaptationGuideSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  tool: z.string(),
+  adaptationTips: z.array(z.string()).optional(),
+  exampleOutput: z.string().optional(),
+});
+
+export type AdaptationGuide = z.infer<typeof AdaptationGuideSchema>;
+
+
 // Additional types
 export type Difficulty = "base" | "advance" | "stretch";
 export type PromptTier = "base" | "advance" | "stretch";
@@ -481,6 +493,7 @@ export interface UserHistoryItem {
   itemType: string;
   action: string;
   createdAt: string;
+  timestamp: string;
 }
 
 export interface AssignmentSubmission {
@@ -500,61 +513,15 @@ export interface SubmissionFile {
   filename: string;
   url: string;
   size: number;
-  mimetype: string;
-}
-
-export interface CourseDetail extends Course {
-  instructor?: string;
-  syllabus?: string;
-  materials?: string[];
-}
-
-export interface CourseOutlineItem {
-  id: string;
-  title: string;
   type: string;
-  duration?: string;
-  completed?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const AssignmentSubmissionFormSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  projectUrl: z.string().url(),
-  notes: z.string().optional(),
-});
-
-export type AssignmentSubmissionForm = z.infer<typeof AssignmentSubmissionFormSchema>;
-
-export const AssignmentFormSchema = AssignmentSchema;
-export type AssignmentFormSchema = AssignmentSubmissionForm;
-
-export interface AssignmentRequirement {
-  id: string;
-  type: string;
-  label: string;
-  description: string;
-  required: boolean;
-  title?: string;
-}
-
-export interface RecommendationResponse {
-  recommendations: Array<{
-    id: string;
-    title: string;
-    type: string;
-    relevanceScore: number;
-    reason: string;
-  }>;
-}
-
-export type KnowledgeCategory = "theory" | "framework" | "lens" | "method";
-
-export interface AdaptationGuide {
-  id: string;
-  title: string;
-  description: string;
-  steps: string[];
-  adaptationTips?: string[];
-  exampleOutput?: string;
+export interface AssignmentFormSchema {
+  name: string;
+  email: string;
+  projectUrl: string;
+  notes?: string;
+  file?: File | null;
 }

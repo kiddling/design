@@ -1,10 +1,14 @@
-import type { PromptTemplate, AdaptationGuide } from "./legacy-types";
+import type { PromptTemplate, AdaptationGuide } from "./types";
+
 
 export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-001",
     title: "点线面基础分析",
-    tier: "beginner",
+    description: "A prompt to analyze the basic elements of a design.",
+    aiTool: "general",
+    difficulty: "base",
+    template: "Analyze the point, line, and plane elements in this image.",
     role: "你是一位专业的平面构成教师，擅长帮助学生理解和识别设计中的基础元素。",
     task: "请分析这张图片中的点、线、面元素，并说明它们如何影响整体构成。",
     methodology:
@@ -18,7 +22,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-002",
     title: "材质纹理描述生成",
-    tier: "beginner",
+    description: "A prompt to generate descriptions for textures.",
+    aiTool: "general",
+    difficulty: "base",
+    template: "Generate a detailed description of the given material.",
     role: "你是一位专注于材质与纹理研究的设计专家。",
     task: "根据给定的材质图片，生成详细的材质描述，包括触觉感受、视觉特征和适用场景。",
     methodology:
@@ -32,7 +39,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-003",
     title: "平衡构成设计方案",
-    tier: "intermediate",
+    description: "A prompt to design balanced compositions.",
+    aiTool: "general",
+    difficulty: "advance",
+    template: "Create three balanced composition options.",
     role: "你是一位资深的平面构成设计师，精通对称与非对称平衡原理。",
     task: "为给定主题创建三种不同的平衡构成方案：对称平衡、非对称平衡和放射平衡。",
     methodology:
@@ -46,7 +56,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-004",
     title: "空间深度创造指导",
-    tier: "intermediate",
+    description: "A prompt to guide students in creating spatial depth.",
+    aiTool: "general",
+    difficulty: "advance",
+    template: "Guide students to create 3D illusion on a 2D plane.",
     role: "你是一位擅长空间表现的视觉设计专家。",
     task: "指导学生运用透视、重叠、大小对比等技法，在二维平面上创造三维空间幻觉。",
     methodology:
@@ -60,7 +73,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-005",
     title: "光影氛围营造",
-    tier: "intermediate",
+    description: "A prompt to create atmosphere with light and shadow.",
+    aiTool: "general",
+    difficulty: "advance",
+    template: "Design a light and shadow scheme for a specific mood.",
     role: "你是一位精通光影艺术的设计导师。",
     task: "分析特定情感氛围需求，设计合适的光影方案，包括光源类型、方向、强度和色温。",
     methodology:
@@ -74,7 +90,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-006",
     title: "色彩情感配色方案",
-    tier: "advanced",
+    description: "A prompt to create color palettes based on emotions.",
+    aiTool: "general",
+    difficulty: "stretch",
+    template: "Create a scientific color scheme based on the design theme.",
     role: "你是一位色彩心理学专家和专业配色师。",
     task: "根据设计主题和目标情感，创建科学的配色方案，包括主色、辅助色和点缀色的选择与搭配。",
     methodology:
@@ -88,7 +107,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-007",
     title: "综合构成批评与改进",
-    tier: "advanced",
+    description: "A prompt for critiquing and improving compositions.",
+    aiTool: "general",
+    difficulty: "stretch",
+    template: "Provide a deep critique of a student's composition work.",
     role: "你是一位资深的设计评论家和教育家，具备深厚的理论功底和丰富的实践经验。",
     task: "对学生的综合构成作品进行深度批评，从多个维度分析其优缺点，并提供具体的改进建议。",
     methodology:
@@ -102,7 +124,10 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: "pt-008",
     title: "AI艺术生成提示词工程",
-    tier: "advanced",
+    description: "A prompt for engineering AI art generation prompts.",
+    aiTool: "midjourney",
+    difficulty: "stretch",
+    template: "Translate a design concept into a high-quality AI prompt.",
     role: "你是一位AI艺术创作专家，精通Midjourney、Stable Diffusion等生成式AI工具。",
     task: "将设计概念转化为高质量的AI生成提示词，优化参数设置以获得期望的视觉效果。",
     methodology:
@@ -117,6 +142,8 @@ export const promptTemplates: PromptTemplate[] = [
 
 export const adaptationGuides: AdaptationGuide[] = [
   {
+    id: "ag-001",
+    title: "Midjourney Adaptation Guide",
     tool: "Midjourney",
     description: "适用于生成高质量、富有艺术感的概念图和氛围图",
     adaptationTips: [
@@ -131,6 +158,8 @@ export const adaptationGuides: AdaptationGuide[] = [
       "/imagine prompt: minimalist composition with geometric shapes, bauhaus style, primary colors, clean lines, high contrast --ar 16:9 --v 6 --stylize 100",
   },
   {
+    id: "ag-002",
+    title: "Stable Diffusion Adaptation Guide",
     tool: "Stable Diffusion",
     description: "开源灵活，适合精确控制和批量生成",
     adaptationTips: [
@@ -145,6 +174,8 @@ export const adaptationGuides: AdaptationGuide[] = [
       "Positive: abstract composition, point line surface elements, minimalist design, professional photography, 4k, high quality\nNegative: text, watermark, low quality, blurry, distorted\nSettings: CFG 9, Steps 30, Size 768x768",
   },
   {
+    id: "ag-003",
+    title: "文心一格 (Wenxin Yige) Adaptation Guide",
     tool: "文心一格 (Wenxin Yige)",
     description: "百度AI艺术生成工具，对中文理解更好",
     adaptationTips: [
@@ -159,6 +190,8 @@ export const adaptationGuides: AdaptationGuide[] = [
       "极简主义平面构成，点线面元素组合，红色圆形、蓝色直线、灰色矩形，包豪斯风格，对称平衡构图，高清，专业设计作品",
   },
   {
+    id: "ag-004",
+    title: "通义万相 (Tongyi Wanxiang) Adaptation Guide",
     tool: "通义万相 (Tongyi Wanxiang)",
     description: "阿里巴巴AI创作工具，擅长多风格生成",
     adaptationTips: [

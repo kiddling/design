@@ -7,6 +7,7 @@
  * Run with: npx tsx shared/validate-data.ts
  */
 
+import { PromptTemplate } from "./types";
 import { validateAllData } from "./data/loaders.js";
 
 console.log("\n" + "=".repeat(60));
@@ -97,7 +98,7 @@ if (allPass && results.course.success && results.course.data) {
   if (results.prompts.success && results.prompts.data) {
     const byTool = new Map<string, number>();
     const byDifficulty = new Map<string, number>();
-    results.prompts.data.forEach(p => {
+    results.prompts.data.forEach((p: PromptTemplate) => {
       byTool.set(p.aiTool, (byTool.get(p.aiTool) || 0) + 1);
       byDifficulty.set(p.difficulty, (byDifficulty.get(p.difficulty) || 0) + 1);
     });

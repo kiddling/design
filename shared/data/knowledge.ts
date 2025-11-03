@@ -43,8 +43,7 @@ export const knowledgeCards: KnowledgeCard[] = [
     difficulty: "advance",
     tags: ["对称", "平衡", "构图"],
     relatedCourses: ["course-03"],
-    relatedCards: ["knowledge-05"],
-    relatedCases: ["case-04", "case-05"],
+    relatedCases: ["case-04", "case-05", "knowledge-05"],
   },
   {
     id: "knowledge-05",
@@ -55,7 +54,6 @@ export const knowledgeCards: KnowledgeCard[] = [
     difficulty: "advance",
     tags: ["动态", "节奏", "构成"],
     relatedCourses: ["course-03"],
-    relatedCards: ["knowledge-04"],
-    relatedCases: ["case-05"],
+    relatedCases: ["case-05", "knowledge-04"],
   },
 ];
