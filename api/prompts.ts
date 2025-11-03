@@ -42,7 +42,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
     if (tags && typeof tags === "string") {
       const tagList = tags.split(",").map((t) => t.trim());
-      filtered = filtered.filter((p) => p.tags?.some((tag) => tagList.includes(tag)));
+      filtered = filtered.filter((p) => p.tags?.some((tag: string) => tagList.includes(tag)));
     }
 
     if (search && typeof search === "string") {

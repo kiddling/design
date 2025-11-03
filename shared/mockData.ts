@@ -1,4 +1,4 @@
-import type { PromptTemplate, AdaptationGuide } from "./types";
+import type { PromptTemplate, AdaptationGuide } from "./legacy-types";
 
 export const promptTemplates: PromptTemplate[] = [
   {

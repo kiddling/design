@@ -75,4 +75,22 @@ export interface Workflow {
     }[];
 }
 
+export interface CourseOutlineItem {
+  id: string;
+  title: string;
+  description: string;
+  week: number;
+}
+
+export interface CourseDetail extends CourseOutlineItem {
+  objectives: string[];
+  resources: string[];
+  image?: string;
+}
+
+export interface AssignmentFormSchema {
+  // Placeholder type - define as needed
+  [key: string]: any;
+}
+
 

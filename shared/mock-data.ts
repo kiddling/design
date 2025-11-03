@@ -1,4 +1,4 @@
-import { Case } from "./types";
+import { Case } from "./legacy-types";
 
 export const mockCases: Case[] = [
   {

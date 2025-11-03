@@ -1,4 +1,4 @@
-import { KnowledgeCard, CardRelationship } from "./types";
+import { KnowledgeCard, CardRelationship } from "./legacy-types";
 
 export const knowledgeCards: KnowledgeCard[] = [
   {

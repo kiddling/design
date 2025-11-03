@@ -5,7 +5,7 @@ import type {
   CourseOutlineItem,
   KnowledgeCard,
   PromptTemplate,
-} from "./types";
+} from "./legacy-types";
 
 export const courses: CourseOutlineItem[] = [
   {
