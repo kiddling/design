@@ -228,12 +228,15 @@ VITE_API_BASE_URL=/api         # API base URL for client
 
 ### Vercel Deployment
 
-This project is configured for deployment on Vercel with the following setup:
+This project is configured for deployment on Vercel with proper SPA routing support:
 
 1. **Automatic Configuration**: The project includes a \`vercel.json\` file that configures:
    - Package manager: pnpm (specified in \`package.json\`)
    - Build command: \`pnpm install && pnpm build\`
    - Output directory: \`dist/client\`
+   - **SPA Rewrites**: All routes redirect to \`index.html\` for client-side routing
+   - **API Routes**: Preserved for backend endpoints at \`/api/*\`
+   - Cache headers for optimal performance
    - Peer dependency handling: via \`.npmrc\` with \`strict-peer-dependencies=false\`
 
 2. **Deploy Steps**:
@@ -252,7 +255,18 @@ This project is configured for deployment on Vercel with the following setup:
    - \`NODE_ENV=production\`
    - \`PORT\` (handled automatically by Vercel)
 
+**📘 For detailed deployment instructions, troubleshooting, and verification checklist, see [DEPLOYMENT.md](./DEPLOYMENT.md).**
+
 ### Troubleshooting Deployment
+
+**Blank Page After Deployment**:
+- Verify \`vercel.json\` includes SPA rewrite rules (see [DEPLOYMENT.md](./DEPLOYMENT.md))
+- Check browser console for errors
+- Ensure \`outputDirectory\` is set to \`dist/client\`
+
+**404 on Route Refresh**:
+- The \`rewrites\` configuration in \`vercel.json\` handles this automatically
+- Verify the catch-all rule: \`{ "source": "/(.*)", "destination": "/index.html" }\`
 
 **Peer Dependency Errors**:
 If you encounter peer dependency conflicts during deployment:
