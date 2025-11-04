@@ -51,20 +51,20 @@ export type WorkflowStep = z.infer<typeof WorkflowStepSchema>;
 export const PromptTemplateSchema = z.object({
   id: z.string(),
   title: z.string(),
-  description: z.string(),
-  aiTool: AIToolSchema,
-  difficulty: DifficultyLevelSchema,
-  template: z.string(),
+  description: z.string().optional(),
+  aiTool: AIToolSchema.optional(),
+  difficulty: DifficultyLevelSchema.optional(),
+  template: z.string().optional(),
   parameters: z.record(z.string(), z.string()).optional(),
   examples: z.array(z.string()).optional(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
   relatedSections: z.array(z.string()).optional(),
   tips: z.array(z.string()).optional(),
   role: z.string().optional(),
   task: z.string().optional(),
   methodology: z.string().optional(),
   expectedOutput: z.string().optional(),
-  tier: z.string().optional(),
+  tier: z.enum(["beginner", "intermediate", "advanced"]).optional(),
   category: z.string().optional(),
   prompt: z.string().optional(),
   label: z.string().optional(),
@@ -159,6 +159,15 @@ export const KnowledgeCardDetailSchema = KnowledgeCardPreviewSchema.extend({
 
 export type KnowledgeCardDetail = z.infer<typeof KnowledgeCardDetailSchema>;
 
+export const RecommendedReadingSchema = z.object({
+  title: z.string(),
+  author: z.string().optional(),
+  url: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export type RecommendedReading = z.infer<typeof RecommendedReadingSchema>;
+
 export const KnowledgeCardSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -174,7 +183,7 @@ export const KnowledgeCardSchema = z.object({
   mediaUrl: z.string().optional(),
   examples: z.array(z.string()).optional(),
   applicationTips: z.array(z.string()).optional(),
-  recommendedReadings: z.array(z.any()).optional(),
+  recommendedReadings: z.array(RecommendedReadingSchema).optional(),
 });
 
 export type KnowledgeCard = z.infer<typeof KnowledgeCardSchema>;
@@ -314,31 +323,35 @@ export const AssignmentSchema = z.object({
 
 export type Assignment = z.infer<typeof AssignmentSchema>;
 
+const SubmissionFileTypeSchema = z.enum(["photo", "diagram", "document", "other"]);
+export type SubmissionFileType = z.infer<typeof SubmissionFileTypeSchema>;
+
+export const SubmissionFileSchema = z.object({
+  id: z.string(),
+  filename: z.string(),
+  originalName: z.string(),
+  path: z.string(),
+  size: z.number(),
+  mimeType: z.string(),
+  uploadedAt: z.string().datetime(),
+  type: SubmissionFileTypeSchema,
+});
+
 export const SubmissionSchema = z.object({
   id: z.string(),
   assignmentId: z.string(),
   userId: z.string(),
   status: SubmissionStatusSchema,
   submittedAt: z.string().datetime().optional(),
-  files: z.array(MediaItemSchema),
-  reflection: z.string().optional(),
-  peerReviews: z
-    .array(
-      z.object({
-        reviewerId: z.string(),
-        comment: z.string(),
-        rating: z.number().min(1).max(5),
-      })
-    )
-    .optional(),
-  instructorFeedback: z
+  files: z.array(SubmissionFileSchema),
+  textFields: z
     .object({
-      scores: z.record(z.string(), z.number()),
-      comment: z.string(),
-      suggestions: z.array(z.string()).optional(),
+      problemStatement: z.string().optional(),
+      hmwQuestion: z.string().optional(),
+      notes: z.string().optional(),
     })
-    .optional(),
-  textFields: z.record(z.string(), z.string()).optional(),
+    .catchall(z.string())
+    .default({}),
   score: z.number().optional(),
   feedback: z.string().optional(),
 });
@@ -423,7 +436,7 @@ export type UserProgress = z.infer<typeof UserProgressSchema>;
 
 // Additional types
 export type Difficulty = "base" | "advance" | "stretch";
-export type PromptTier = "base" | "advance" | "stretch";
+export type PromptTier = "beginner" | "intermediate" | "advanced";
 
 export interface CustomPrompt {
   id: string;
@@ -451,18 +464,18 @@ export interface CardRelationship {
   description?: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data?: T;
   success: boolean;
   message?: string;
   error?: string;
 }
 
-export interface PaginatedResponse<T = any> {
-  data: T[];
+export interface PaginatedResponse<T = unknown> {
+  items: T[];
+  total: number;
   page: number;
   pageSize: number;
-  total: number;
   totalPages: number;
 }
 
@@ -470,7 +483,7 @@ export interface UserFavorite {
   id: string;
   userId: string;
   itemId: string;
-  itemType: "case" | "knowledge" | "prompt" | "workflow";
+  itemType: "case" | "knowledge" | "prompt" | "workflow" | "course" | "resource";
   createdAt: string;
 }
 
@@ -480,17 +493,18 @@ export interface UserHistoryItem {
   itemId: string;
   itemType: string;
   action: string;
-  createdAt: string;
+  timestamp: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AssignmentSubmission {
   id: string;
   assignmentId: string;
   userId: string;
-  status: "draft" | "submitted" | "under_review" | "needs_revision" | "approved" | "graded";
+  status: Submission["status"];
   submittedAt?: string;
-  files: MediaItem[];
-  textFields?: Record<string, string>;
+  files: SubmissionFile[];
+  textFields: Submission["textFields"];
   score?: number;
   feedback?: string;
 }
@@ -498,9 +512,12 @@ export interface AssignmentSubmission {
 export interface SubmissionFile {
   id: string;
   filename: string;
-  url: string;
+  originalName: string;
+  path: string;
   size: number;
-  mimetype: string;
+  mimeType: string;
+  uploadedAt: string;
+  type: SubmissionFileType;
 }
 
 export interface CourseDetail extends Course {
