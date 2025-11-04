@@ -50,19 +50,32 @@ export interface CardRelationship {
   type: "related" | "prerequisite";
 }
 
+export type PromptTier = "beginner" | "intermediate" | "advanced";
+
 export interface PromptTemplate {
   id: string;
   title: string;
-  description: string;
-  category: string;
-  prompt: string;
+  description?: string;
+  category?: string;
+  label?: string;
+  prompt?: string;
+  tags?: string[];
+  tier?: PromptTier;
+  role?: string;
+  task?: string;
+  methodology?: string;
+  expectedOutput?: string;
+  aiTool?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  tips?: string[];
 }
 
 export interface AdaptationGuide {
-  id: string;
-  title: string;
-  description: string;
   tool: string;
+  description: string;
+  adaptationTips?: string[];
+  exampleOutput?: string;
 }
 
 export interface Workflow {
@@ -88,9 +101,22 @@ export interface CourseDetail extends CourseOutlineItem {
   image?: string;
 }
 
+export interface CaseStudy {
+  id: string;
+  title: string;
+  description: string;
+  discipline: string;
+  difficulty: string;
+  tags?: string[];
+  thumbnail?: string;
+  imageUrl?: string;
+}
+
 export interface AssignmentFormSchema {
-  // Placeholder type - define as needed
-  [key: string]: any;
+  name: string;
+  email: string;
+  projectUrl: string;
+  notes?: string;
 }
 
 
